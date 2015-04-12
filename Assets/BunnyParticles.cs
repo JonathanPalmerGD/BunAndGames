@@ -14,8 +14,8 @@ public class BunnyParticles : MonoBehaviour
 
 	void Start ()
 	{
-		bunnyInfo = new string[100];
-		bunnyDir = new int[100];
+		bunnyInfo = new string[10000];
+		bunnyDir = new int[10000];
 	}
 
 	void Update() 
