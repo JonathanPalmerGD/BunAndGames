@@ -7,6 +7,8 @@ public class BunnyParticles : MonoBehaviour
 	private ParticleSystem bunnyPart;
 	ParticleSystem.Particle[] m_Particles;
 
+	public GameObject dog;
+
 	public string[] bunnyInfo;
 	public int[] bunnyDir;
 
@@ -74,6 +76,22 @@ public class BunnyParticles : MonoBehaviour
 
 			m_Particles[i].velocity.Normalize();
 			#endregion
+
+			Vector3 dogPos = new Vector3(dog.transform.position.x, 0, dog.transform.position.y);
+
+			float distToDog = Vector3.Distance(m_Particles[i].position, dogPos);
+			if(distToDog < 5)
+			{
+				m_Particles[i].velocity -= dog.transform.position - m_Particles[i].position;
+				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
+				m_Particles[i].velocity.Normalize();
+				float accel = (2 / distToDog);
+
+				//TODO:
+				//Cap the accel
+
+				m_Particles[i].velocity = m_Particles[i].velocity * accel;
+			}
 
 			//StoreVelocity
 			//bunnyInfo[i] = m_Particles[i].velocity.ToString();
