@@ -1,19 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BunnyParticles : MonoBehaviour
 {
 	private ParticleSystem bunnyPart;
 	ParticleSystem.Particle[] m_Particles;
 
+	public string[] bunnyInfo;
+	public int[] bunnyDir;
+
 	public GameObject Accelerator;
 
-	void Start () 
+	void Start ()
 	{
-	
+		bunnyInfo = new string[100];
+		bunnyDir = new int[100];
 	}
-	
-	void Update () 
+
+	void Update() 
 	{
 		if(Input.GetKeyDown(KeyCode.X))
 		{
@@ -24,75 +29,101 @@ public class BunnyParticles : MonoBehaviour
 			UpdateParticleColor(new Color(0.6f, 1.0f, 0.6f));
 		}
 
-		//HandleParticles();
+		HandleParticles();
 
-		ClampParticleVel();
+		//ClampParticleVel();
 	}
 
 	void HandleParticles()
 	{
 		InitializeIfNeeded();
 
-		int numParticlesAlive = bunnyPart.GetParticles(m_Particles);
-
-		// Change only the particles that are alive
-		for (int i = 0; i < numParticlesAlive; i++)
-		{
-			ClampIndividualParticle(m_Particles[i]);
-		}
-
-		// Apply the particle changes to the particle system
-		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
-	}
-
-	void AvoidParticle()
-	{
-		InitializeIfNeeded();
-
-		int numParticlesAlive = bunnyPart.GetParticles(m_Particles);
-
-		// Change only the particles that are alive
-		for (int i = 0; i < numParticlesAlive; i++)
-		{
-
-		}
-
-		// Apply the particle changes to the particle system
-		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
-	}
-
-	void ClampIndividualParticle(ParticleSystem.Particle particle)
-	{
 		int bound = 10;
+		int numParticlesAlive = bunnyPart.GetParticles(m_Particles);
 
-		particle.velocity = new Vector3(particle.velocity.x, 0, particle.velocity.z);
-
-		//If particle would leave the screen
-		if (particle.position.x < -bound && particle.velocity.x < 0)
+		// Change only the particles that are alive
+		for (int i = 0; i < numParticlesAlive; i++)
 		{
-			particle.velocity = new Vector3(-particle.velocity.x, 0, particle.velocity.z);
+			#region Screen bounding
+			m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
+
+			//If particle would leave the screen
+			if (m_Particles[i].position.x < -bound && m_Particles[i].velocity.x < 0)
+			{
+				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
+			}
+
+			//If particle would leave the screen
+			if (m_Particles[i].position.x > bound && m_Particles[i].velocity.x > 0)
+			{
+				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
+			}
+
+
+			//If particle would leave the screen
+			if (m_Particles[i].position.z < -bound && m_Particles[i].velocity.z < 0)
+			{
+				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
+			}
+
+			//If particle would leave the screen
+			if (m_Particles[i].position.z > bound && m_Particles[i].velocity.z > 0)
+			{
+				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
+			}
+
+			m_Particles[i].velocity.Normalize();
+			#endregion
+
+			//StoreVelocity
+			//bunnyInfo[i] = m_Particles[i].velocity.ToString();
+			Vector3 curVel = m_Particles[i].velocity;
+
+			//Directional
+			//	7	0	1
+			//	6	+	2
+			//	5	4	3
+
+			if (m_Particles[i].velocity.x > 0)
+			{
+				if (m_Particles[i].velocity.z > 0)
+				{
+					bunnyDir[i] = 1;
+				}
+				else
+				{
+					bunnyDir[i] = 3;
+				}
+			}
+			else
+			{
+				if (m_Particles[i].velocity.z > 0)
+				{
+					bunnyDir[i] = 7;
+				}
+				else
+				{
+					bunnyDir[i] = 5;
+				}
+			}
+
+			if (m_Particles[i].lifetime < m_Particles[i].startLifetime / bunnyDir[i])
+			{
+				m_Particles[i].lifetime = m_Particles[i].startLifetime / bunnyDir[i] + 2;
+			}
+			else if (m_Particles[i].lifetime > m_Particles[i].startLifetime / bunnyDir[i] + 2)
+			{
+				m_Particles[i].lifetime = m_Particles[i].startLifetime / bunnyDir[i] + 2;
+			}
+			
+			//bunnyInfo[i] = m_Particles[i].velocity.ToString() + "  " + m_Particles[i].lifetime;
+
+
+			//m_Particles[i].lifetime = .5f;
 		}
 
-		//If particle would leave the screen
-		if (particle.position.x > bound && particle.velocity.x > 0)
-		{
-			particle.velocity = new Vector3(-particle.velocity.x, 0, particle.velocity.z);
-		}
-
-		/*
-		//If particle would leave the screen
-		if (m_Particles[i].position.z < -bound && m_Particles[i].velocity.z < 0)
-		{
-			m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
-		}
-
-		//If particle would leave the screen
-		if (m_Particles[i].position.z > bound && m_Particles[i].velocity.z > 0)
-		{
-			m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
-		}
-		*/
-		particle.velocity.Normalize();
+		// Apply the particle changes to the particle system
+		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
 	}
 
 	void ClampParticleVel()
@@ -156,6 +187,7 @@ public class BunnyParticles : MonoBehaviour
 		// Apply the particle changes to the particle system
 		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
 	}
+
 	void InitializeIfNeeded()
 	{
 		if (bunnyPart == null)
