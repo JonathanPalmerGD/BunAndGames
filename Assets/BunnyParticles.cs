@@ -26,9 +26,13 @@ public class BunnyParticles : MonoBehaviour
 		{
 			UpdateParticleColor(new Color(0.6f, 0.6f, 1.0f));
 		}
-		if(Input.GetKeyDown(KeyCode.C))
+		if (Input.GetKeyDown(KeyCode.C))
 		{
 			UpdateParticleColor(new Color(0.6f, 1.0f, 0.6f));
+		}
+		if (Input.GetKeyDown(KeyCode.Return))
+		{
+			//bunnyPart.maxParticles = bunnyPart.maxParticles * 2;
 		}
 
 		HandleParticles();
