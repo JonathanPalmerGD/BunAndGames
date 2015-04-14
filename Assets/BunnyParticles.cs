@@ -140,24 +140,27 @@ public class BunnyParticles : MonoBehaviour
 			#endregion
 
 			#region Bunny Scaring
-			Vector3 dogPos = new Vector3(dog.transform.position.x, dog.transform.position.y, 0);
-
-			float distToDog = Vector3.Distance(m_Particles[i].position, dogPos);
-			if (distToDog < fleeRange)
+			if (dog != null)
 			{
-				Vector3 fearVector = dogPos - m_Particles[i].position;
-				//Debug.DrawLine(dogPos, dogPos - fearVector, Color.black, .5f);
-				m_Particles[i].velocity -= fearVector;
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-				m_Particles[i].velocity.Normalize();
-				if (distToDog < .2f)
+				Vector3 dogPos = new Vector3(dog.transform.position.x, dog.transform.position.y, 0);
+
+				float distToDog = Vector3.Distance(m_Particles[i].position, dogPos);
+				if (distToDog < fleeRange)
 				{
-					distToDog = .2f;
+					Vector3 fearVector = dogPos - m_Particles[i].position;
+					//Debug.DrawLine(dogPos, dogPos - fearVector, Color.black, .5f);
+					m_Particles[i].velocity -= fearVector;
+					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+					m_Particles[i].velocity.Normalize();
+					if (distToDog < .2f)
+					{
+						distToDog = .2f;
+					}
+					float accel = (fearStrength / distToDog);
+
+					m_Particles[i].velocity = m_Particles[i].velocity * accel;
+					m_Particles[i].velocity.Normalize();
 				}
-				float accel = (fearStrength / distToDog);
-				
-				m_Particles[i].velocity = m_Particles[i].velocity * accel;
-				m_Particles[i].velocity.Normalize();
 			}
 			#endregion
 
