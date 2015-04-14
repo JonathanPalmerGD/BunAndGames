@@ -30,7 +30,7 @@ public class CharacterController : MonoBehaviour
 				animTimer = 0;
 
 				float xDif = targetPosition.x - transform.position.x;
-				Debug.Log(xDif);
+
 				if (xDif < -0.5f)
 				{
 					if (sprRend.sprite != left1)
