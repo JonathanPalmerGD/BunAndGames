@@ -186,7 +186,7 @@ public class BunnyParticles : MonoBehaviour
 			}
 			else
 			{
-				if(xVel < Mathf.Abs(yVel))
+				if(xVel < -Mathf.Abs(yVel))
 				{
 					bunnyDir[i] = 6;
 					set = true;
@@ -203,7 +203,7 @@ public class BunnyParticles : MonoBehaviour
 				}
 				else
 				{
-					if (yVel < Mathf.Abs(xVel))
+					if (yVel < -Mathf.Abs(xVel))
 					{
 						bunnyDir[i] = 4;
 					}
