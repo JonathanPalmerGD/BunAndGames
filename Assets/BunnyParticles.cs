@@ -15,6 +15,7 @@ public class BunnyParticles : MonoBehaviour
 	private float fleeRange = 1.5f;
 	private float fearStrength = 2f;
 	private float maxVelocity = 2;
+	public AudioSource bark;
 	
 	public GameObject Accelerator;
 
@@ -47,6 +48,8 @@ public class BunnyParticles : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
 			fleeRange = 6;
+
+			bark.Play();
 		}
 
 		fleeRange = Mathf.Lerp(fleeRange, normalFleeRange, Time.deltaTime * 10);
