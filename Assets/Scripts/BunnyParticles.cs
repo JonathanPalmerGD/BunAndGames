@@ -18,7 +18,18 @@ public class BunnyParticles : MonoBehaviour
 	public int HowManyBunnies;
 	public AudioSource bark;
 
-	public Camera cam;	
+	public Camera cam;
+
+	public Vector3 paintPoint;
+	private float paintCounter = 0;
+	private float paintTimer = 0.35f;
+	public Color paintColor = new Color(.7f, .0f, .0f);
+	private float paintChangeRate = 10;
+
+	public Color[] colorOptions;
+	public int paintIndex;
+
+	private Vector3 clickPos;
 
 	public void Init()
 	{
@@ -26,13 +37,63 @@ public class BunnyParticles : MonoBehaviour
 		bunnyPart.maxParticles = HowManyBunnies;
 		bunnyInfo = new string[HowManyBunnies];
 		bunnyDir = new int[HowManyBunnies];
-		Invoke("RandomParticleColor", 1f + HowManyBunnies / 900);
 
+		colorOptions = new Color[25];
+		for (int i = 0; i < colorOptions.Length; i++)
+		{
+			colorOptions[i] = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+		}
 		cam = GameObject.Find("Main Camera").camera;
+
+		Invoke("RandomParticleColor", 1f + HowManyBunnies / 900);
 	}
 
-	void Update() 
+	void Update()
 	{
+		#region Paint clock
+		if (paintCounter > 0)
+		{
+			paintCounter -= Time.deltaTime;
+		}
+		#endregion
+
+		#region Paint At Cursor
+		if (Input.GetKey(KeyCode.Q) || Input.GetMouseButton(1))
+		{
+			clickPos = Input.mousePosition;
+			clickPos.z = 10.0f;
+
+			Vector3 targPoint = Camera.main.ScreenToWorldPoint (clickPos);
+			Vector3 mousePointOnScreen = new Vector3((-Input.mousePosition.x - Screen.width/2), (Input.mousePosition.y - Screen.height/2), transform.position.z);
+
+			paintPoint = targPoint;
+
+			if(mousePointOnScreen.x > 0 && mousePointOnScreen.x < Screen.width && mousePointOnScreen.y > 0 && mousePointOnScreen.y < Screen.height)
+			{
+				paintPoint = mousePointOnScreen;
+			}
+
+			paintCounter = paintTimer;
+
+			Debug.DrawLine(paintPoint, new Vector3(0, 0, -10), Color.white, 15.0f);
+		}
+		#endregion
+
+		#region Color Changing
+		if (paintColor == colorOptions[paintIndex])
+		{
+			paintIndex = Random.Range(0, colorOptions.Length);
+		}
+		else
+		{
+			paintColor = new Color(
+				Mathf.Lerp(paintColor.r, colorOptions[paintIndex].r, Time.deltaTime * paintChangeRate), 
+				Mathf.Lerp(paintColor.g, colorOptions[paintIndex].g, Time.deltaTime * paintChangeRate), 
+				Mathf.Lerp(paintColor.b, colorOptions[paintIndex].b, Time.deltaTime * paintChangeRate));
+		}
+		#endregion
+
+		#region Old Mass Paint
 		/*if(Input.GetKeyDown(KeyCode.X))
 		{
 			UpdateParticleColor(new Color(0.6f, 0.6f, 1.0f));
@@ -49,13 +110,16 @@ public class BunnyParticles : MonoBehaviour
 		{
 			//bunnyPart.maxParticles = bunnyPart.maxParticles * 2;
 		}*/
+		#endregion
 
+		#region Barking
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
 			Bark();
 		}
 
 		fleeRange = Mathf.Lerp(fleeRange, normalFleeRange, Time.deltaTime * 10);
+		#endregion
 
 		HandleParticles();
 
@@ -152,6 +216,17 @@ public class BunnyParticles : MonoBehaviour
 			}*/
 
 			//m_Particles[i].velocity.Normalize();
+			#endregion
+
+			#region Bunny Painting
+			if (paintCounter > 0)
+			{
+				float dist = Vector3.Distance(paintPoint, m_Particles[i].position);
+				if (dist < 1.25f)
+				{
+					m_Particles[i].color = paintColor;
+				}
+			}
 			#endregion
 
 			#region Bunny Scaring
