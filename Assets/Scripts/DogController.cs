@@ -3,9 +3,11 @@ using System.Collections;
 
 public class DogController : MonoBehaviour 
 {
+	private int clickNum;
 	public float speed;
 	public Vector3 targetPosition;
 	private Vector3 clickPos;
+	private Touch[] touches;
 
 	public bool animating = true;
 
@@ -19,8 +21,15 @@ public class DogController : MonoBehaviour
 	private float animRate = .15f;
 	public SpriteRenderer sprRend;
 
+	void Start(){
+
+		touches = new Touch[2];
+
+	}
+
 	void Update () 
 	{
+		#region Animation
 		if (animating)
 		{
 			animTimer += Time.deltaTime;
@@ -67,16 +76,31 @@ public class DogController : MonoBehaviour
 				}
 			}
 		}
+		#endregion
 
 		transform.position = Vector3.Lerp (transform.position, targetPosition, Time.deltaTime * speed);
 
-		clickPos = Input.mousePosition;
+		clickPos = Input.mousePosition; //mousePosition returns Vector3 position based on screen width and heigh. 0,0 is bottom left corner.
 
-		if (Input.GetMouseButton(0))
-		{
+		if (Input.touchCount != null)
+			clickNum = Input.touchCount;
+
+		//Debug.Log ("Touch Count: " + clickNum);
+
+		if (Input.GetMouseButton (0)) {
+
+			if (Input.GetMouseButtonDown (0) && (Input.touchCount == null || Input.touchCount <= 0)){
+				clickNum += 1;
+				/*for (int i = 0; i < clickNum; i++){
+					//touches[i] = Input.GetTouch();
+					//Debug.Log("Touches array? " + touches.GetLength());
+				}*/
+				//Debug.Log ("Click Count: " + clickNum);
+			}
+
 			clickPos.z = 10.0f;
 
-			Vector3 targPoint = Camera.main.ScreenToWorldPoint (clickPos); //mousePosition returns Vector3 position based on screen width and heigh. 0,0 is bottom left corner.
+			Vector3 targPoint = Camera.main.ScreenToWorldPoint (clickPos); 
 			//Debug.DrawLine(Vector3.zero, targPoint, Color.white, 15.0f);
 			Vector3 test = new Vector3((-Input.mousePosition.x - Screen.width/2), (Input.mousePosition.y - Screen.height/2), transform.position.z);
 
