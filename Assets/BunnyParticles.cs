@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class BunnyParticles : MonoBehaviour
 {
-	private ParticleSystem bunnyPart;
+	public ParticleSystem bunnyPart;
 	ParticleSystem.Particle[] m_Particles;
 
 	public GameObject dog;
@@ -15,15 +15,20 @@ public class BunnyParticles : MonoBehaviour
 	private float fleeRange = 1.5f;
 	private float fearStrength = 2f;
 	private float maxVelocity = 2;
+	public int HowManyBunnies;
 	public AudioSource bark;
-	
-	public GameObject Accelerator;
 
-	void Start ()
+	public Camera cam;	
+
+	public void Init()
 	{
-		bunnyInfo = new string[400];
-		bunnyDir = new int[400];
-		Invoke("RandomParticleColor", 1f);
+		InitializeIfNeeded();
+		bunnyPart.maxParticles = HowManyBunnies;
+		bunnyInfo = new string[HowManyBunnies];
+		bunnyDir = new int[HowManyBunnies];
+		Invoke("RandomParticleColor", 1f + HowManyBunnies / 900);
+
+		cam = GameObject.Find("Main Camera").camera;
 	}
 
 	void Update() 
@@ -47,9 +52,7 @@ public class BunnyParticles : MonoBehaviour
 
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
-			fleeRange = 6;
-
-			bark.Play();
+			Bark();
 		}
 
 		fleeRange = Mathf.Lerp(fleeRange, normalFleeRange, Time.deltaTime * 10);
@@ -59,11 +62,20 @@ public class BunnyParticles : MonoBehaviour
 		//ClampParticleVel();
 	}
 
+	public void Bark()
+	{
+		fleeRange = 6;
+
+		bark.Play();
+	}
+
 	void HandleParticles()
 	{
 		InitializeIfNeeded();
 
-		int bound = 10;
+		int xBound = 9;
+		int yBound = 6;
+		
 		int numParticlesAlive = bunnyPart.GetParticles(m_Particles);
 
 		// Change only the particles that are alive
@@ -74,26 +86,26 @@ public class BunnyParticles : MonoBehaviour
 			m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
 
 			//If particle would leave the screen
-			if (m_Particles[i].position.x < -bound && m_Particles[i].velocity.x < 0)
+			if (m_Particles[i].position.x < -xBound && m_Particles[i].velocity.x < 0)
 			{
 				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
 			}
 
 			//If particle would leave the screen
-			if (m_Particles[i].position.x > bound && m_Particles[i].velocity.x > 0)
+			if (m_Particles[i].position.x > xBound && m_Particles[i].velocity.x > 0)
 			{
 				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
 			}
 
 
 			//If particle would leave the screen
-			if (m_Particles[i].position.y < -bound && m_Particles[i].velocity.y < 0)
+			if (m_Particles[i].position.y < -yBound && m_Particles[i].velocity.y < 0)
 			{
 				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
 			}
 
 			//If particle would leave the screen
-			if (m_Particles[i].position.y > bound && m_Particles[i].velocity.y > 0)
+			if (m_Particles[i].position.y > yBound && m_Particles[i].velocity.y > 0)
 			{
 				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
 			}
@@ -170,7 +182,7 @@ public class BunnyParticles : MonoBehaviour
 			#region Direction Storing
 			//StoreVelocity
 			bunnyInfo[i] = m_Particles[i].velocity.ToString();
-			Vector3 curVel = m_Particles[i].velocity;
+			//Vector3 curVel = m_Particles[i].velocity;
 
 			//Directional
 			//	7	0	1
@@ -374,6 +386,11 @@ public class BunnyParticles : MonoBehaviour
 
 		// Apply the particle changes to the particle system
 		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
+	}
+
+	public void ClearBunnies()
+	{
+		bunnyPart.maxParticles = 0;
 	}
 
 	void InitializeIfNeeded()

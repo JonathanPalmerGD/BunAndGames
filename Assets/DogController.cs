@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CharacterController : MonoBehaviour 
+public class DogController : MonoBehaviour 
 {
 	public float speed;
 	public Vector3 targetPosition;
@@ -30,8 +30,20 @@ public class CharacterController : MonoBehaviour
 				animTimer = 0;
 
 				float xDif = targetPosition.x - transform.position.x;
+				float yDif = targetPosition.y - transform.position.y;
 
-				if (xDif < -0.5f)
+				if (xDif > -0.5f && xDif < 0.5f && yDif > -0.5f && yDif < 0.5f)
+				{
+					if (sprRend.sprite != sit1)
+					{
+						sprRend.sprite = sit1;
+					}
+					else
+					{
+						sprRend.sprite = sit2;
+					}
+				}
+				else if (xDif < 0.0f)
 				{
 					if (sprRend.sprite != left1)
 					{
@@ -42,7 +54,7 @@ public class CharacterController : MonoBehaviour
 						sprRend.sprite = left2;
 					}
 				}
-				else if (xDif > 0.5f)
+				else if (xDif > 0.0f)
 				{
 					if (sprRend.sprite != right1)
 					{
@@ -53,20 +65,6 @@ public class CharacterController : MonoBehaviour
 						sprRend.sprite = right2;
 					}
 				}
-				else
-				{
-					//sprRend.sprite = sit1;
-
-					if (sprRend.sprite != sit1)
-					{
-						sprRend.sprite = sit1;
-					}
-					else
-					{
-						sprRend.sprite = sit2;
-					}
-
-				}
 			}
 		}
 
@@ -74,7 +72,7 @@ public class CharacterController : MonoBehaviour
 
 		clickPos = Input.mousePosition;
 
-		if (Input.GetMouseButton (0))
+		if (Input.GetMouseButton(0))
 		{
 			clickPos.z = 10.0f;
 
