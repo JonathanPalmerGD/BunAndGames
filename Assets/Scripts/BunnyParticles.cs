@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -31,12 +32,26 @@ public class BunnyParticles : MonoBehaviour
 
 	private Vector3 clickPos;
 
+	private List<Obstacle> obs;
+
 	public void Init()
 	{
 		InitializeIfNeeded();
 		bunnyPart.maxParticles = HowManyBunnies;
 		bunnyInfo = new string[HowManyBunnies];
 		bunnyDir = new int[HowManyBunnies];
+
+		obs = new List<Obstacle>();
+		UnityEngine.Object[] objects = GameObject.FindGameObjectsWithTag("Obstacle");
+
+		foreach (GameObject go in GameObject.FindGameObjectsWithTag("Obstacle"))
+		{
+			Obstacle indObs = go.GetComponent<Obstacle>();
+			if (indObs != null)
+			{
+				obs.Add(indObs);
+			}
+		}
 
 		colorOptions = new Color[25];
 		for (int i = 0; i < colorOptions.Length; i++)
@@ -142,6 +157,10 @@ public class BunnyParticles : MonoBehaviour
 		
 		int numParticlesAlive = bunnyPart.GetParticles(m_Particles);
 
+		Vector3 dogPos = new Vector3(dog.transform.position.x, dog.transform.position.y, 0);
+		Vector3 fearVector = Vector3.zero;
+		float distFromObj = float.MaxValue;
+
 		// Change only the particles that are alive
 		for (int i = 0; i < numParticlesAlive; i++)
 		{
@@ -232,24 +251,51 @@ public class BunnyParticles : MonoBehaviour
 			#region Bunny Scaring
 			if (dog != null)
 			{
-				Vector3 dogPos = new Vector3(dog.transform.position.x, dog.transform.position.y, 0);
-
-				float distToDog = Vector3.Distance(m_Particles[i].position, dogPos);
-				if (distToDog < fleeRange)
+				distFromObj = Vector3.Distance(m_Particles[i].position, dogPos);
+				if (distFromObj < fleeRange)
 				{
-					Vector3 fearVector = dogPos - m_Particles[i].position;
+					fearVector = dogPos - m_Particles[i].position;
+
 					//Debug.DrawLine(dogPos, dogPos - fearVector, Color.black, .5f);
 					m_Particles[i].velocity -= fearVector;
 					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
 					m_Particles[i].velocity.Normalize();
-					if (distToDog < .2f)
+					if (distFromObj < .2f)
 					{
-						distToDog = .2f;
+						distFromObj = .2f;
 					}
-					float accel = (fearStrength / distToDog);
+					float accel = (fearStrength / distFromObj);
 
 					m_Particles[i].velocity = m_Particles[i].velocity * accel;
 					m_Particles[i].velocity.Normalize();
+				}
+			}
+
+			#endregion
+
+			#region Walls
+			if (obs != null)
+			{
+				for (int j = 0; j < obs.Count; i++)
+				{
+					distFromObj = Vector3.Distance(m_Particles[i].position, obs[j].transform.position);
+
+					if (distFromObj < obs[i].radius)
+					{
+						fearVector = dogPos - m_Particles[i].position;
+
+						m_Particles[i].velocity -= fearVector;
+						m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+						m_Particles[i].velocity.Normalize();
+						if (distFromObj < .2f)
+						{
+							distFromObj = .2f;
+						}
+						float accel = (fearStrength / distFromObj);
+
+						m_Particles[i].velocity = m_Particles[i].velocity * accel;
+						m_Particles[i].velocity.Normalize();
+					}
 				}
 			}
 			#endregion
