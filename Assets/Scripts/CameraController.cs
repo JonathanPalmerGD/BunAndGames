@@ -4,105 +4,74 @@ using System.Collections;
 public class CameraController : MonoBehaviour {
 	public GameObject player;
 	public GameObject background;
-	public Vector3 futurePosition;
-	public bool set = false;
+	public Vector3 targetPosition;
+	public bool initialized = false;
 
 	// SCREEN DIMENSIONS IN WORLD COORDS
-	private float screenHIWC; // SCREEN HEIGHT IN WORLD COORDS
-	private float screenWIWC; // SCREEN WIDTH IN WORLD COORDS
+	public float screenHIWC; // SCREEN HEIGHT IN WORLD COORDS
+	public float screenWIWC; // SCREEN WIDTH IN WORLD COORDS
 
-	private Vector3 backgroundTR; // BACKGROUND TOP RIGHT CORNER
-	private Vector3 backgroundLL; // BACKGROUND LOWER LEFT CORNER
+	public Vector3 lowerLeftHC; // BACKGROUND LOWER LEFT CORNER
+	public Vector3 topRightHC; // BACKGROUND TOP RIGHT CORNER
 
-    private Vector3 upper_right, lower_left;
+	public Vector3 upper_right, lower_left;
 
-	void Start () {
-	}
+	void Init() {
+		Vector3 myScreen = new Vector3(Screen.width, Screen.height, 0);
 
-	public Vector3[] GetGameBounds(Vector3[] meshVerts) {
-		Vector3[] bounds = new Vector3[4];
-		
-		// [0] = least x, [1] = greatest x, [2] = greatest y, [3] = least y
-		float[] values = new float[4];
+		// Screens coordinate corner location
+		var upperLeftScreen = new Vector3(0, Screen.height, Camera.main.depth);
+		var upperRightScreen = new Vector3(Screen.width, Screen.height, Camera.main.depth);
+		var lowerLeftScreen = new Vector3(0, 0, Camera.main.depth);
+		var lowerRightScreen = new Vector3(Screen.width, 0, Camera.main.depth);
 
-		for (int i = 0; i < values.Length; i++) {
-			values[i] = 0;
-		}
-		for (int i = 0; i < meshVerts.Length; i++) { 
-			float x= meshVerts[i].x, y= meshVerts[i].y;
-			if (x > values[1]) {
-				values[1] = x;
-			}
-			if (x < values[0]) {
-				values[0] = x;
-			}
-			if (y > values[2]) {
-				values[2] = y;
-			}
-			if (y < values[3]) {
-				values[3] = y;
-			}
-		}
+		//Corner locations in world coordinates
+		var upperLeft = camera.ScreenToWorldPoint(upperLeftScreen);
+		var upperRight = camera.ScreenToWorldPoint(upperRightScreen);
+		var lowerLeft = camera.ScreenToWorldPoint(lowerLeftScreen);
+		var lowerRight = camera.ScreenToWorldPoint(lowerRightScreen);
 
-		bounds[0] = new Vector3(values[0], values[3], 0);
-		bounds[1] = new Vector3(values[0], values[2], 0);
-		bounds[2] = new Vector3(values[1], values[2], 0);
-		bounds[3] = new Vector3(values[1], values[3], 0);
-		return bounds;
+		lower_left = lowerLeft;
+		upper_right = upperRight;
+
+		screenHIWC = Mathf.Abs(upper_right.y - lower_left.y);
+		screenWIWC = Mathf.Abs(upper_right.x - lower_left.x);
+
+		topRightHC = new Vector3(background.transform.localScale.x / 2, background.transform.localScale.y / 2, background.transform.localScale.z / 2);
+		lowerLeftHC = new Vector3(-background.transform.localScale.x / 2, -background.transform.localScale.y / 2, -background.transform.localScale.z / 2);
+		initialized = true;
 	}
 
 	void Update () {
-		if (!set) {
-			Vector3 myScreen = new Vector3(Screen.width, Screen.height, 0);
-			
-			// Screens coordinate corner location
-			var upperLeftScreen = new Vector3(0, Screen.height, Camera.main.depth);
-			var upperRightScreen = new Vector3(Screen.width, Screen.height, Camera.main.depth);
-			var lowerLeftScreen = new Vector3(0, 0, Camera.main.depth);
-			var lowerRightScreen = new Vector3(Screen.width, 0, Camera.main.depth);
-
-			//Corner locations in world coordinates
-			var upperLeft = camera.ScreenToWorldPoint(upperLeftScreen);
-			var upperRight = camera.ScreenToWorldPoint(upperRightScreen);
-			var lowerLeft = camera.ScreenToWorldPoint(lowerLeftScreen);
-			var lowerRight = camera.ScreenToWorldPoint(lowerRightScreen);
-			
-			lower_left = lowerLeft;
-			upper_right = upperRight;
-
-			screenHIWC = Mathf.Abs(upper_right.y - lower_left.y);
-			screenWIWC = Mathf.Abs(upper_right.x - lower_left.x);
-
-			Vector3[] bounds = GetGameBounds(background.GetComponent<MeshFilter>().mesh.vertices);
-			backgroundLL = bounds[0];
-			backgroundTR = bounds[2];
-			set = true;
+		if (!initialized) {
+			Init();
 		}
 
-        Debug.DrawLine(new Vector3(backgroundLL.x, backgroundLL.y, -5),
-                       new Vector3(backgroundTR.x, backgroundTR.y, -5),Color.cyan);
+		Debug.DrawLine(new Vector3(lowerLeftHC.x, lowerLeftHC.y, -5),
+					   new Vector3(topRightHC.x, topRightHC.y, -5), Color.cyan);
         Debug.DrawLine(new Vector3(upper_right.x,upper_right.y, -3),
                        new Vector3(lower_left.x,lower_left.y, -3), Color.red);
 
-		futurePosition = player.gameObject.transform.position;
-		futurePosition.z = this.gameObject.transform.position.z;
+		targetPosition = player.gameObject.transform.position;
+		//Keep the camera far out
+		targetPosition.z = this.gameObject.transform.position.z;
 		
 		// X LOCATION LOCKED IN RANGE DESIRED
-		if (futurePosition.x > backgroundTR.x - (screenWIWC / 2)) {
-			futurePosition.x = backgroundTR.x - (screenWIWC / 2); 
+		if (targetPosition.x > topRightHC.x - (screenWIWC / 2)) {
+			targetPosition.x = topRightHC.x - (screenWIWC / 2); 
 		}
-		if (futurePosition.x < backgroundLL.x + (screenWIWC / 2)) {
-			futurePosition.x = backgroundLL.x + (screenWIWC / 2); 
+		if (targetPosition.x < lowerLeftHC.x + (screenWIWC / 2)) {
+			targetPosition.x = lowerLeftHC.x + (screenWIWC / 2); 
 		}
 
 		// Y LOCATION LOCKED IN RANGE DESIRED
-		if (futurePosition.y > backgroundTR.y - (screenHIWC / 2)) {
-			futurePosition.x = backgroundTR.y - (screenHIWC / 2);
+		if (targetPosition.y > topRightHC.y - (screenHIWC / 2)) {
+			targetPosition.y = topRightHC.y - (screenHIWC / 2);
 		}
-		if (futurePosition.y < backgroundLL.y + (screenHIWC / 2)) {
-			futurePosition.y = backgroundLL.y + (screenHIWC / 2);
+		if (targetPosition.y < lowerLeftHC.y + (screenHIWC / 2)) {
+			targetPosition.y = lowerLeftHC.y + (screenHIWC / 2);
 		}
 
-		gameObject.transform.position = Vector3.Lerp(gameObject.transform.position,futurePosition,0.05f);
+		gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, targetPosition, 0.05f);
 	}
 }

@@ -19,6 +19,8 @@ public class BunnyParticles : MonoBehaviour
 	public int HowManyBunnies;
 	public AudioSource bark;
 
+	public CameraController camCon;
+
 	public Camera cam;
 
 	#region Coloring
@@ -174,35 +176,72 @@ public class BunnyParticles : MonoBehaviour
 		// Change only the particles that are alive
 		for (int i = 0; i < numParticlesAlive; i++)
 		{
-			#region Screen bounding
-
-			m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.x < -xBound && m_Particles[i].velocity.x < 0)
+			if (true)
 			{
-				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-			}
+				#region Big Screen Bounding
+				//lowerLeftHC;
+				//topRightHC;
 
-			//If particle would leave the screen
-			if (m_Particles[i].position.x > xBound && m_Particles[i].velocity.x > 0)
+				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+
+				//If particle would leave the screen
+				if (m_Particles[i].position.x < camCon.lowerLeftHC.x + 1 && m_Particles[i].velocity.x < 0)
+				{
+					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+				}
+
+				//If particle would leave the screen
+				if (m_Particles[i].position.x > camCon.topRightHC.x - 1 && m_Particles[i].velocity.x > 0)
+				{
+					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+				}
+
+
+				//If particle would leave the screen
+				if (m_Particles[i].position.y < camCon.lowerLeftHC.y + 1 && m_Particles[i].velocity.y < 0)
+				{
+					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
+				}
+
+				//If particle would leave the screen
+				if (m_Particles[i].position.y > camCon.lowerLeftHC.x - 1 && m_Particles[i].velocity.y > 0)
+				{
+					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
+				}
+				#endregion
+			}
+			else
 			{
-				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-			}
+				#region Screen bounding
+
+				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+
+				//If particle would leave the screen
+				if (m_Particles[i].position.x < -xBound && m_Particles[i].velocity.x < 0)
+				{
+					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+				}
+
+				//If particle would leave the screen
+				if (m_Particles[i].position.x > xBound && m_Particles[i].velocity.x > 0)
+				{
+					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+				}
 
 
-			//If particle would leave the screen
-			if (m_Particles[i].position.y < -yBound && m_Particles[i].velocity.y < 0)
-			{
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
-			}
+				//If particle would leave the screen
+				if (m_Particles[i].position.y < -yBound && m_Particles[i].velocity.y < 0)
+				{
+					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
+				}
 
-			//If particle would leave the screen
-			if (m_Particles[i].position.y > yBound && m_Particles[i].velocity.y > 0)
-			{
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
+				//If particle would leave the screen
+				if (m_Particles[i].position.y > yBound && m_Particles[i].velocity.y > 0)
+				{
+					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
+				}
+				#endregion
 			}
-			#endregion
 
 			#region Old Screen Bounding
 			/*m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
