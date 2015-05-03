@@ -17,7 +17,7 @@ public class CameraController : MonoBehaviour {
 	void Start () {
 	}
 
-	private Vector3[] getGameBounds(Vector3[] meshVerts) {
+	public Vector3[] GetGameBounds(Vector3[] meshVerts) {
 		Vector3[] bounds = new Vector3[4];
 		
 		// [0] = least x, [1] = greatest x, [2] = greatest y, [3] = least y
@@ -77,7 +77,7 @@ public class CameraController : MonoBehaviour {
 			screenHIWC = Mathf.Abs(upper_right.y - lower_left.y);
 			screenWIWC = Mathf.Abs(upper_right.x - lower_left.x);
 
-			Vector3[] bounds = getGameBounds(background.GetComponent<MeshFilter>().mesh.vertices);
+			Vector3[] bounds = GetGameBounds(background.GetComponent<MeshFilter>().mesh.vertices);
 			backgroundLL = bounds[0];
 			backgroundTR = bounds[2];
 			set = true;
