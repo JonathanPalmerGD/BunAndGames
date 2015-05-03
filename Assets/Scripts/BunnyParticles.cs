@@ -204,7 +204,7 @@ public class BunnyParticles : MonoBehaviour
 				}
 
 				//If particle would leave the screen
-				if (m_Particles[i].position.y > camCon.lowerLeftHC.x - 1 && m_Particles[i].velocity.y > 0)
+				if (m_Particles[i].position.y > camCon.topRightHC.y - 1 && m_Particles[i].velocity.y > 0)
 				{
 					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
 				}
