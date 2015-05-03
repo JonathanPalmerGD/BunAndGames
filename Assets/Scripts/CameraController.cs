@@ -65,14 +65,8 @@ public class CameraController : MonoBehaviour {
 			var lowerLeft = camera.ScreenToWorldPoint(lowerLeftScreen);
 			var lowerRight = camera.ScreenToWorldPoint(lowerRightScreen);
 			
-
-			Vector3 lower_left =
-				lowerLeft;
-			print("screen " + lower_left + "\n");
-
-			Vector3 upper_right =
-				upperRight;
-			print("screen " + upper_right + "\n");
+			Vector3 lower_left = lowerLeft;
+			Vector3 upper_right = upperRight;
 
 			screenHIWC = Mathf.Abs(upper_right.y - lower_left.y);
 			screenWIWC = Mathf.Abs(upper_right.x - lower_left.x);
