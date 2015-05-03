@@ -14,6 +14,8 @@ public class CameraController : MonoBehaviour {
 	private Vector3 backgroundTR; // BACKGROUND TOP RIGHT CORNER
 	private Vector3 backgroundLL; // BACKGROUND LOWER LEFT CORNER
 
+    private Vector3 upper_right, lower_left;
+
 	void Start () {
 	}
 
@@ -65,8 +67,8 @@ public class CameraController : MonoBehaviour {
 			var lowerLeft = camera.ScreenToWorldPoint(lowerLeftScreen);
 			var lowerRight = camera.ScreenToWorldPoint(lowerRightScreen);
 			
-			Vector3 lower_left = lowerLeft;
-			Vector3 upper_right = upperRight;
+			lower_left = lowerLeft;
+			upper_right = upperRight;
 
 			screenHIWC = Mathf.Abs(upper_right.y - lower_left.y);
 			screenWIWC = Mathf.Abs(upper_right.x - lower_left.x);
@@ -76,6 +78,11 @@ public class CameraController : MonoBehaviour {
 			backgroundTR = bounds[2];
 			set = true;
 		}
+
+        Debug.DrawLine(new Vector3(backgroundLL.x, backgroundLL.y, -5),
+                       new Vector3(backgroundTR.x, backgroundTR.y, -5),Color.cyan);
+        Debug.DrawLine(new Vector3(upper_right.x,upper_right.y, -3),
+                       new Vector3(lower_left.x,lower_left.y, -3), Color.red);
 
 		futurePosition = player.gameObject.transform.position;
 		futurePosition.z = this.gameObject.transform.position.z;
