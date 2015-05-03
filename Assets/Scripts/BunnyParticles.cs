@@ -21,14 +21,24 @@ public class BunnyParticles : MonoBehaviour
 
 	public Camera cam;
 
+	#region Coloring
+	public bool forcePalette = true;
 	public Vector3 paintPoint;
 	private float paintCounter = 0;
 	private float paintTimer = 0.35f;
 	public Color paintColor = new Color(.7f, .0f, .0f);
 	private float paintChangeRate = 10;
 
+
+	private Color[] PaletteColor = { new Color( .270f, .807f, .937f),
+									new Color( 1.00f, .960f, .647f),
+									new Color( 1.00f, .831f, .854f),
+									new Color( .600f, .823f, .894f),
+									new Color( .847f, .792f, .705f), };
+
 	public Color[] colorOptions;
 	public int paintIndex;
+	#endregion
 
 	private Vector3 clickPos;
 
@@ -90,7 +100,7 @@ public class BunnyParticles : MonoBehaviour
 
 			paintCounter = paintTimer;
 
-			Debug.DrawLine(paintPoint, new Vector3(0, 0, -10), Color.white, 15.0f);
+			//Debug.DrawLine(paintPoint, new Vector3(0, 0, -10), Color.white, 15.0f);
 		}
 		#endregion
 
@@ -276,13 +286,16 @@ public class BunnyParticles : MonoBehaviour
 			#region Walls
 			if (obs != null)
 			{
-				for (int j = 0; j < obs.Count; i++)
+				for (int j = 0; j < obs.Count; j++)
 				{
 					distFromObj = Vector3.Distance(m_Particles[i].position, obs[j].transform.position);
 
-					if (distFromObj < obs[i].radius)
+					if (distFromObj < obs[j].radius)
 					{
-						fearVector = dogPos - m_Particles[i].position;
+						float prevVel = m_Particles[i].velocity.magnitude;
+
+						Vector3 obsPos = new Vector3(obs[j].transform.position.x + m_Particles[i].velocity.x * Time.deltaTime, obs[j].transform.position.y + m_Particles[i].velocity.y * Time.deltaTime, 0);
+						fearVector = obsPos - m_Particles[i].position;
 
 						m_Particles[i].velocity -= fearVector;
 						m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
@@ -290,9 +303,9 @@ public class BunnyParticles : MonoBehaviour
 						if (distFromObj < .2f)
 						{
 							distFromObj = .2f;
-						}
-						float accel = (fearStrength / distFromObj);
-
+						} 
+						
+						float accel = prevVel;
 						m_Particles[i].velocity = m_Particles[i].velocity * accel;
 						m_Particles[i].velocity.Normalize();
 					}
@@ -484,7 +497,14 @@ public class BunnyParticles : MonoBehaviour
 		// Change only the particles that are alive
 		for (int i = 0; i < numParticlesAlive; i++)
 		{
+			if (forcePalette)
+			{
+				m_Particles[i].color = GetRandColor();
+			}
+			else
+			{
 			m_Particles[i].color = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+			}
 		}
 
 		// Apply the particle changes to the particle system
@@ -512,6 +532,15 @@ public class BunnyParticles : MonoBehaviour
 	public void ClearBunnies()
 	{
 		bunnyPart.maxParticles = 0;
+	}
+
+	private Color GetRandColor()
+	{
+		if (PaletteColor.Length > 0)
+		{
+			return PaletteColor[Random.Range(0, PaletteColor.Length)];
+		}
+		return Color.black;
 	}
 
 	void InitializeIfNeeded()

@@ -1,13 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class DogController : MonoBehaviour 
 {
 	private int clickNum;
-	public float speed;
+	private float speed = 10;
 	public Vector3 targetPosition;
-	private Vector3 clickPos;
+	private Vector3 mousePos;
 	private Touch[] touches;
+	private int oldClicksAllowed = 100;
+	public List<Vector3> clicks;
+	private Vector3 mousePosLastFrame = Vector3.zero;
+	private Vector3 mouseVelLastFrame = Vector3.zero;
+	private Vector3 mouseVel = Vector3.zero;
 
 	public bool animating = true;
 
@@ -21,14 +27,27 @@ public class DogController : MonoBehaviour
 	private float animRate = .15f;
 	public SpriteRenderer sprRend;
 
-	void Start(){
-
+	void Start()
+	{
+		clicks = new List<Vector3>();
 		touches = new Touch[2];
-
 	}
 
-	void Update () 
+	void Update()
 	{
+		#region Position Updating
+		if (clicks.Count > 0)
+		{
+			Debug.DrawLine(transform.position, clicks[0] - Vector3.forward, Color.cyan);
+			for (int i = 1; i < clicks.Count; i++)
+			{
+				Debug.DrawLine(clicks[i - 1] - Vector3.forward, clicks[i] - Vector3.forward, Color.white);
+			}
+				
+			targetPosition = clicks[0];
+		}
+		#endregion
+		
 		#region Animation
 		if (animating)
 		{
@@ -77,45 +96,79 @@ public class DogController : MonoBehaviour
 			}
 		}
 		#endregion
+	
+		#region Position & Click updating
+		Vector3 dir = targetPosition - transform.position;
+		//Debug.Log(dir.magnitude);
+		if (dir.magnitude > 1)
+		{
+			dir.Normalize();
+			transform.position += dir * Time.deltaTime * speed;
+		}
+		else
+		{
+			if (clicks.Count > 0)
+			{
+				clicks.RemoveAt(0);
+			}
+		}
+		//transform.position = Vector3.Lerp (transform.position, targetPosition, Time.deltaTime * speed);
 
-		transform.position = Vector3.Lerp (transform.position, targetPosition, Time.deltaTime * speed);
-
-		clickPos = Input.mousePosition; //mousePosition returns Vector3 position based on screen width and heigh. 0,0 is bottom left corner.
+		mouseVelLastFrame = mouseVel;
+		mousePosLastFrame = mousePos;
+		mousePos = Input.mousePosition; //mousePosition returns Vector3 position based on screen width and heigh. 0,0 is bottom left corner.
+		mousePos.z = 10;
 
 		if (Input.touchCount != null)
+		{
 			clickNum = Input.touchCount;
-
-		//Debug.Log ("Touch Count: " + clickNum);
-
-		if (Input.GetMouseButton (0)) {
-
-			if (Input.GetMouseButtonDown (0) && (Input.touchCount == null || Input.touchCount <= 0)){
-				clickNum += 1;
-				/*for (int i = 0; i < clickNum; i++){
-					//touches[i] = Input.GetTouch();
-					//Debug.Log("Touches array? " + touches.GetLength());
-				}*/
-				//Debug.Log ("Click Count: " + clickNum);
-			}
-
-			clickPos.z = 10.0f;
-
-			Vector3 targPoint = Camera.main.ScreenToWorldPoint (clickPos); 
-			//Debug.DrawLine(Vector3.zero, targPoint, Color.white, 15.0f);
-			Vector3 test = new Vector3((-Input.mousePosition.x - Screen.width/2), (Input.mousePosition.y - Screen.height/2), transform.position.z);
-
-			targetPosition = targPoint;
-
-			if(test.x > 0 && test.x < Screen.width && test.y > 0 && test.y < Screen.height){
-
-				targetPosition = test;
-
-			}
-			//Debug.DrawLine(targetPosition, transform.position, Color.black, 15.0f);
 		}
+		#endregion
+		if (true)
+		{
+			#region Swiping
+			mouseVel = mousePosLastFrame - mousePos;
+			Vector3 velDiff = mouseVel - mouseVelLastFrame;
+			float magDiff = mouseVel.magnitude - mouseVelLastFrame.magnitude;
 
-	
+			if (magDiff > 2 || magDiff < -2)
+			{
+				Vector3 targPoint = ScreenToWorldPos(mousePos);
+				if (clicks.Count > oldClicksAllowed)
+				{
+					clicks.RemoveAt(0);
+				}
+				clicks.Add(targPoint);
+			}
+			#endregion
+		}
+		else
+		{
+			#region Tapping for new Destinations
+			if (Input.GetMouseButtonDown(0))
+			{
+				Vector3 targPoint = ScreenToWorldPos(mousePos);
+				if (clicks.Count > oldClicksAllowed)
+				{
+					clicks.RemoveAt(0);
+				}
+				clicks.Add(targPoint);
+			}
+			#endregion
+		}
+	}
 
+	private Vector3 ScreenToWorldPos(Vector3 mousePos)
+	{
+		mousePos.z = 10;
+		Vector3 targPoint = Camera.main.ScreenToWorldPoint(mousePos);
+		Vector3 adjustedMousePos = new Vector3((-Input.mousePosition.x - Screen.width / 2), (Input.mousePosition.y - Screen.height / 2), transform.position.z);
 
+		/*if (adjustedMousePos.x > 0 && adjustedMousePos.x < Screen.width && adjustedMousePos.y > 0 && adjustedMousePos.y < Screen.height)
+		{
+				
+		}*/
+
+		return targPoint;
 	}
 }
