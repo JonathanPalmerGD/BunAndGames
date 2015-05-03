@@ -32,9 +32,9 @@ public class GameManager : MonoBehaviour
 		bunPart.dog = dog;
 		menuUI.gameObject.SetActive(false);
 
-		#if UNITY_ANDROID
+		//#if UNITY_ANDROID
 		barkCanvas.gameObject.SetActive(true);
-		#endif
+		//#endif
 
 		bunPart.Init();
 
@@ -52,8 +52,8 @@ public class GameManager : MonoBehaviour
 		bunPart.dog = dog;
 		menuUI.gameObject.SetActive(true);
 
-#if UNITY_ANDROID
+//#if UNITY_ANDROID
 		barkCanvas.gameObject.SetActive(false);
-#endif
+//#endif
 	}
 }

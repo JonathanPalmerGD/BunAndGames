@@ -127,11 +127,7 @@ public class DogController : MonoBehaviour
 		if (true)
 		{
 			#region Swiping
-			mouseVel = mousePosLastFrame - mousePos;
-			Vector3 velDiff = mouseVel - mouseVelLastFrame;
-			float magDiff = mouseVel.magnitude - mouseVelLastFrame.magnitude;
-
-			if (magDiff > 2 || magDiff < -2)
+			if(!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0))
 			{
 				Vector3 targPoint = ScreenToWorldPos(mousePos);
 				if (clicks.Count > oldClicksAllowed)
@@ -139,6 +135,25 @@ public class DogController : MonoBehaviour
 					clicks.RemoveAt(0);
 				}
 				clicks.Add(targPoint);
+			}
+			else
+			{
+				if (Input.GetMouseButton(0))
+				{
+					mouseVel = mousePosLastFrame - mousePos;
+					Vector3 velDiff = mouseVel - mouseVelLastFrame;
+					float magDiff = mouseVel.magnitude - mouseVelLastFrame.magnitude;
+
+					if (magDiff > 2 || magDiff < -2)
+					{
+						Vector3 targPoint = ScreenToWorldPos(mousePos);
+						if (clicks.Count > oldClicksAllowed)
+						{
+							clicks.RemoveAt(0);
+						}
+						clicks.Add(targPoint);
+					}
+				}
 			}
 			#endregion
 		}
