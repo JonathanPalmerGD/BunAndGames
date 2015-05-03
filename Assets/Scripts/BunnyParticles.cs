@@ -52,7 +52,6 @@ public class BunnyParticles : MonoBehaviour
 				obs.Add(indObs);
 			}
 		}
-
 		colorOptions = new Color[25];
 		for (int i = 0; i < colorOptions.Length; i++)
 		{
@@ -276,22 +275,27 @@ public class BunnyParticles : MonoBehaviour
 			#region Walls
 			if (obs != null)
 			{
-				for (int j = 0; j < obs.Count; i++)
+				for (int j = 0; j < obs.Count; j++)
 				{
 					distFromObj = Vector3.Distance(m_Particles[i].position, obs[j].transform.position);
 
-					if (distFromObj < obs[i].radius)
+					if (distFromObj < obs[j].radius)
 					{
-						fearVector = dogPos - m_Particles[i].position;
+						float prevVel = m_Particles[i].velocity.magnitude;
+
+						Vector3 obsPos = new Vector3(obs[j].transform.position.x + m_Particles[i].velocity.x * Time.deltaTime, obs[j].transform.position.y + m_Particles[i].velocity.y * Time.deltaTime, 0);
+						fearVector = obsPos - m_Particles[i].position;
 
 						m_Particles[i].velocity -= fearVector;
 						m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
 						m_Particles[i].velocity.Normalize();
+
 						if (distFromObj < .2f)
 						{
 							distFromObj = .2f;
 						}
-						float accel = (fearStrength / distFromObj);
+
+						float accel = prevVel;//(fearStrength / distFromObj);
 
 						m_Particles[i].velocity = m_Particles[i].velocity * accel;
 						m_Particles[i].velocity.Normalize();
