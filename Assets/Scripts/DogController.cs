@@ -8,7 +8,7 @@ public class DogController : MonoBehaviour
 	private float speed = 10;
 	public Vector3 targetPosition;
 	private Vector3 mousePos;
-	private int oldClicksAllowed = 100;
+	private int oldClicksAllowed = 300;
 	public List<Vector3> clicks;
 	private Vector3 mousePosLastFrame = Vector3.zero;
 	private Vector3 mouseVelLastFrame = Vector3.zero;
