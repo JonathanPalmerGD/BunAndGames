@@ -13,7 +13,6 @@ public class CameraController : MonoBehaviour {
 
 	public Vector3 lowerLeftHC; // BACKGROUND LOWER LEFT CORNER
 	public Vector3 topRightHC; // BACKGROUND TOP RIGHT CORNER
-
 	public Vector3 upper_right, lower_left;
 
 	void Init() {
@@ -37,8 +36,8 @@ public class CameraController : MonoBehaviour {
 		screenHIWC = Mathf.Abs(upper_right.y - lower_left.y);
 		screenWIWC = Mathf.Abs(upper_right.x - lower_left.x);
 
-		topRightHC = new Vector3(background.transform.localScale.x / 2, background.transform.localScale.y / 2, background.transform.localScale.z / 2);
-		lowerLeftHC = new Vector3(-background.transform.localScale.x / 2, -background.transform.localScale.y / 2, -background.transform.localScale.z / 2);
+		topRightHC = background.transform.localScale / 2;
+		lowerLeftHC = -background.transform.localScale / 2;
 		initialized = true;
 	}
 
@@ -47,10 +46,10 @@ public class CameraController : MonoBehaviour {
 			Init();
 		}
 
-		//Debug.DrawLine(new Vector3(lowerLeftHC.x, lowerLeftHC.y, -5),
-		//			   new Vector3(topRightHC.x, topRightHC.y, -5), Color.cyan);
-        //Debug.DrawLine(new Vector3(upper_right.x,upper_right.y, -3),
-        //               new Vector3(lower_left.x,lower_left.y, -3), Color.red);
+		Debug.DrawLine(new Vector3(lowerLeftHC.x, lowerLeftHC.y, -5),
+					   new Vector3(topRightHC.x, topRightHC.y, -5), Color.cyan);
+		Debug.DrawLine(new Vector3(upper_right.x,upper_right.y, -3),
+					   new Vector3(lower_left.x,lower_left.y, -3), Color.red);
 
 		targetPosition = player.gameObject.transform.position;
 		//Keep the camera far out
