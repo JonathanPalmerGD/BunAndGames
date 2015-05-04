@@ -155,6 +155,8 @@ public class BunnyParticles : MonoBehaviour
 
 	public void Bark()
 	{
+		GameManager.Inst.GainPoints(2);
+
 		fleeRange = 6;
 
 		bark.Play();
@@ -303,6 +305,8 @@ public class BunnyParticles : MonoBehaviour
 				distFromObj = Vector3.Distance(m_Particles[i].position, dogPos);
 				if (distFromObj < fleeRange)
 				{
+					GameManager.Inst.GainPointsTimeRate(3);
+
 					fearVector = dogPos - m_Particles[i].position;
 
 					//Debug.DrawLine(dogPos, dogPos - fearVector, Color.black, .5f);

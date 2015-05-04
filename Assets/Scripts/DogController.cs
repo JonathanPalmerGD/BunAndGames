@@ -8,7 +8,6 @@ public class DogController : MonoBehaviour
 	private float speed = 10;
 	public Vector3 targetPosition;
 	private Vector3 mousePos;
-	private Touch[] touches;
 	private int oldClicksAllowed = 100;
 	public List<Vector3> clicks;
 	private Vector3 mousePosLastFrame = Vector3.zero;
@@ -16,6 +15,7 @@ public class DogController : MonoBehaviour
 	private Vector3 mouseVel = Vector3.zero;
 
 	public bool animating = true;
+	bool movedLastFrame = false;
 
 	public Sprite left1;
 	public Sprite left2;
@@ -25,24 +25,28 @@ public class DogController : MonoBehaviour
 	public Sprite sit2;
 	private float animTimer = 0;
 	private float animRate = .15f;
+	public LineRenderer lRend;
 	public SpriteRenderer sprRend;
 
 	void Start()
 	{
 		clicks = new List<Vector3>();
-		touches = new Touch[2];
+
+		lRend.SetWidth(.2f, .2f);
 	}
 
 	void Update()
 	{
+		DrawPath();
+
 		#region Position Updating
 		if (clicks.Count > 0)
 		{
-			Debug.DrawLine(transform.position, clicks[0] - Vector3.forward, Color.cyan);
+			/*Debug.DrawLine(transform.position, clicks[0] - Vector3.forward, Color.cyan);
 			for (int i = 1; i < clicks.Count; i++)
 			{
 				Debug.DrawLine(clicks[i - 1] - Vector3.forward, clicks[i] - Vector3.forward, Color.white);
-			}
+			}*/
 				
 			targetPosition = clicks[0];
 		}
@@ -60,7 +64,8 @@ public class DogController : MonoBehaviour
 				float xDif = targetPosition.x - transform.position.x;
 				float yDif = targetPosition.y - transform.position.y;
 
-				if (xDif > -0.5f && xDif < 0.5f && yDif > -0.5f && yDif < 0.5f)
+				if (!movedLastFrame)
+					//if (xDif > -0.5f && xDif < 0.5f && yDif > -0.5f && yDif < 0.5f)
 				{
 					if (sprRend.sprite != sit1)
 					{
@@ -107,12 +112,22 @@ public class DogController : MonoBehaviour
 		}
 		else
 		{
+			transform.position += dir * Time.deltaTime * speed;
+
 			if (clicks.Count > 0)
 			{
 				clicks.RemoveAt(0);
 			}
 		}
-		//transform.position = Vector3.Lerp (transform.position, targetPosition, Time.deltaTime * speed);
+
+		if (dir.magnitude > 0.02)
+		{
+			movedLastFrame = true;
+		}
+		else
+		{
+			movedLastFrame = false;
+		}
 
 		mouseVelLastFrame = mouseVel;
 		mousePosLastFrame = mousePos;
@@ -138,21 +153,21 @@ public class DogController : MonoBehaviour
 			}
 			else
 			{
-				if (Input.GetMouseButton(0))
+				if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButton(0))
 				{
 					mouseVel = mousePosLastFrame - mousePos;
 					Vector3 velDiff = mouseVel - mouseVelLastFrame;
 					float magDiff = mouseVel.magnitude - mouseVelLastFrame.magnitude;
 
-					if (magDiff > 2 || magDiff < -2)
-					{
+					//if (magDiff > 2 || magDiff < -2)
+					//{
 						Vector3 targPoint = ScreenToWorldPos(mousePos);
 						if (clicks.Count > oldClicksAllowed)
 						{
 							clicks.RemoveAt(0);
 						}
 						clicks.Add(targPoint);
-					}
+					//}
 				}
 			}
 			#endregion
@@ -170,6 +185,25 @@ public class DogController : MonoBehaviour
 				clicks.Add(targPoint);
 			}
 			#endregion
+		}
+	}
+
+	private void DrawPath()
+	{
+		lRend.material.mainTextureScale = new Vector2(clicks.Count, 1);
+		if (clicks.Count > 0)
+		{
+			lRend.SetVertexCount(clicks.Count + 1);
+			lRend.SetPosition(0, transform.position);
+
+			for (int i = 0; i < clicks.Count; i++)
+			{
+				lRend.SetPosition(i + 1, clicks[i]);
+			}
+		}
+		else
+		{
+			lRend.SetVertexCount(0);
 		}
 	}
 

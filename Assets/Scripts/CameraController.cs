@@ -47,10 +47,10 @@ public class CameraController : MonoBehaviour {
 			Init();
 		}
 
-		Debug.DrawLine(new Vector3(lowerLeftHC.x, lowerLeftHC.y, -5),
-					   new Vector3(topRightHC.x, topRightHC.y, -5), Color.cyan);
-        Debug.DrawLine(new Vector3(upper_right.x,upper_right.y, -3),
-                       new Vector3(lower_left.x,lower_left.y, -3), Color.red);
+		//Debug.DrawLine(new Vector3(lowerLeftHC.x, lowerLeftHC.y, -5),
+		//			   new Vector3(topRightHC.x, topRightHC.y, -5), Color.cyan);
+        //Debug.DrawLine(new Vector3(upper_right.x,upper_right.y, -3),
+        //               new Vector3(lower_left.x,lower_left.y, -3), Color.red);
 
 		targetPosition = player.gameObject.transform.position;
 		//Keep the camera far out

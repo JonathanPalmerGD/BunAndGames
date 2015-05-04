@@ -12,10 +12,30 @@ public class GameManager : MonoBehaviour
 	public Canvas barkCanvas;
 	public Slider bunnyCount;
 	public AudioManager audioMan;
+	public static GameManager Inst;
+	public float playerPoints = 0;
+
+	public Text pointDisplay;
 
 	public void Start()
 	{
+		Inst = this;
 		barkCanvas.gameObject.SetActive(false);
+	}
+
+	public void Update()
+	{
+		pointDisplay.text = ((int)playerPoints).ToString();
+	}
+
+	public void GainPointsTimeRate(float amount)
+	{
+		playerPoints += amount * Time.deltaTime;
+	}
+
+	public void GainPoints(float amount)
+	{
+		playerPoints += amount;
 	}
 
 	public void BeginGame()
