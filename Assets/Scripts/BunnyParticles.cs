@@ -433,9 +433,20 @@ public class BunnyParticles : MonoBehaviour
 			#endregion
 
 			#region Epoch Locking
+			float lifeTime = bunnyPart.startLifetime;
+			float cycles = 8;
+			float dirMin = Mathf.Clamp((bunnyDir[i] - 1), 0, 8);
 
-			float maxAge = 20 - bunnyDir[i] * .555555555f;
-			float minAge = 20 - (bunnyDir[i] + 1) * .555555555f;
+			float maxAge = lifeTime - (bunnyDir[i] * 8 * cycles / lifeTime);
+			float minAge = lifeTime - ((bunnyDir[i] + 1) * 8 * cycles / lifeTime);
+				//lifeTime - (dirMin * 8) * cycles/lifeTime;
+			//float minAge = 
+				//lifeTime - (bunnyDir[i] * 8) * cycles / lifeTime;
+
+			//Debug.Log("Dir: " + bunnyDir[i] + "\t\t" + maxAge + "\t\t" + minAge + "\n");
+
+			//float maxAge = 20 - bunnyDir[i] * .555555555f;			
+			//float minAge = 20 - (bunnyDir[i] + 1) * .555555555f;
 
 			//If the current lifetime is above the MAX lifetime, set it to the max lifetime
 			if (m_Particles[i].lifetime >= maxAge)
