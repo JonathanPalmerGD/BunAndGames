@@ -173,7 +173,16 @@ public class BunnyParticles : MonoBehaviour
 
 		Vector3 dogPos = new Vector3(dog.transform.position.x, dog.transform.position.y, 0);
 		Vector3 fearVector = Vector3.zero;
+		Vector3 obsPos;
+		float dist;
+		float prevVel;
 		float distFromObj = float.MaxValue;
+		float xVel, yVel;
+		float accel;
+		bool set;
+		float lifeTime, cycles, dirMin, maxAge, minAge, ageAdjust;
+		
+		float largestAdjust = 0, smallestAdjust = 0;
 
 		// Change only the particles that are alive
 		for (int i = 0; i < numParticlesAlive; i++)
@@ -245,53 +254,10 @@ public class BunnyParticles : MonoBehaviour
 				#endregion
 			}
 
-			#region Old Screen Bounding
-			/*m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.x < -bound && m_Particles[i].velocity.x < 0)
-			{
-				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
-			}
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.x > bound && m_Particles[i].velocity.x > 0)
-			{
-				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
-			}
-
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.z < -bound && m_Particles[i].velocity.z < 0)
-			{
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
-			}
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.z > bound && m_Particles[i].velocity.z > 0)
-			{
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
-			}
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.z < -bound && m_Particles[i].velocity.z < 0)
-			{
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
-			}
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.z > bound && m_Particles[i].velocity.z > 0)
-			{
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
-			}*/
-
-			//m_Particles[i].velocity.Normalize();
-			#endregion
-
 			#region Bunny Painting
 			if (paintCounter > 0)
 			{
-				float dist = Vector3.Distance(paintPoint, m_Particles[i].position);
+				dist = Vector3.Distance(paintPoint, m_Particles[i].position);
 				if (dist < 1.25f)
 				{
 					m_Particles[i].color = paintColor;
@@ -317,7 +283,7 @@ public class BunnyParticles : MonoBehaviour
 					{
 						distFromObj = .2f;
 					}
-					float accel = (fearStrength / distFromObj);
+					accel = (fearStrength / distFromObj);
 
 					m_Particles[i].velocity = m_Particles[i].velocity * accel;
 					m_Particles[i].velocity.Normalize();
@@ -335,9 +301,9 @@ public class BunnyParticles : MonoBehaviour
 
 					if (distFromObj < obs[j].radius)
 					{
-						float prevVel = m_Particles[i].velocity.magnitude;
+						prevVel = m_Particles[i].velocity.magnitude;
 
-						Vector3 obsPos = new Vector3(obs[j].transform.position.x + m_Particles[i].velocity.x * Time.deltaTime, obs[j].transform.position.y + m_Particles[i].velocity.y * Time.deltaTime, 0);
+						obsPos = new Vector3(obs[j].transform.position.x + m_Particles[i].velocity.x * Time.deltaTime, obs[j].transform.position.y + m_Particles[i].velocity.y * Time.deltaTime, 0);
 						fearVector = obsPos - m_Particles[i].position;
 
 						m_Particles[i].velocity -= fearVector;
@@ -348,7 +314,7 @@ public class BunnyParticles : MonoBehaviour
 							distFromObj = .2f;
 						} 
 						
-						float accel = prevVel;
+						accel = prevVel;
 						m_Particles[i].velocity = m_Particles[i].velocity * accel;
 						m_Particles[i].velocity.Normalize();
 					}
@@ -366,10 +332,10 @@ public class BunnyParticles : MonoBehaviour
 			//	6	+	2
 			//	5	4	3
 
-			float xVel = m_Particles[i].velocity.x;
-			float yVel = m_Particles[i].velocity.y;
+			xVel = m_Particles[i].velocity.x;
+			yVel = m_Particles[i].velocity.y;
 
-			bool set = false;
+			set = false;
 
 			if (xVel > 0)
 			{
@@ -433,12 +399,12 @@ public class BunnyParticles : MonoBehaviour
 			#endregion
 
 			#region Epoch Locking
-			float lifeTime = bunnyPart.startLifetime;
-			float cycles = 8;
-			float dirMin = Mathf.Clamp((bunnyDir[i] - 1), 0, 8);
+			lifeTime = bunnyPart.startLifetime;
+			cycles = 8;
+			dirMin = Mathf.Clamp((bunnyDir[i] - 1), 0, 8);
 
-			float maxAge = lifeTime - (bunnyDir[i] * 8 * cycles / lifeTime);
-			float minAge = lifeTime - ((bunnyDir[i] + 1) * 8 * cycles / lifeTime);
+			maxAge = lifeTime - (bunnyDir[i] * 8 * cycles / lifeTime);
+			minAge = lifeTime - ((bunnyDir[i] + 1) * 8 * cycles / lifeTime);
 				//lifeTime - (dirMin * 8) * cycles/lifeTime;
 			//float minAge = 
 				//lifeTime - (bunnyDir[i] * 8) * cycles / lifeTime;
@@ -448,34 +414,30 @@ public class BunnyParticles : MonoBehaviour
 			//float maxAge = 20 - bunnyDir[i] * .555555555f;			
 			//float minAge = 20 - (bunnyDir[i] + 1) * .555555555f;
 
+			//Debug.Log(m_Particles[i].velocity.magnitude + "\n");
+			ageAdjust = Mathf.Clamp(m_Particles[i].velocity.magnitude / 100 - .02f, -.01f, .2f);
+			//ageAdjust = m_Particles[i].velocity.magnitude / 100 - .02f;
+
+			if (ageAdjust > largestAdjust)
+			{
+				largestAdjust = ageAdjust;
+			}
+			if (ageAdjust < smallestAdjust)
+			{
+				smallestAdjust = ageAdjust;
+			}
+			m_Particles[i].lifetime -= (m_Particles[i].velocity.magnitude / 100 - .02f);
+
 			//If the current lifetime is above the MAX lifetime, set it to the max lifetime
 			if (m_Particles[i].lifetime >= maxAge)
 			{
 				m_Particles[i].lifetime = maxAge;
 			}
+			//If the current lifetime is below the MIN lifetime, set it to the min lifetime
 			else if(m_Particles[i].lifetime <= minAge + .15f)
 			{
 				m_Particles[i].lifetime = maxAge - .15f;
 			}
-			//If the current lifetime is below the MIN lifetime, set it to the min lifetime
-
-
-
-
-
-
-
-
-
-			/*
-			if (m_Particles[i].lifetime < m_Particles[i].startLifetime / bunnyDir[i])
-			{
-				m_Particles[i].lifetime = m_Particles[i].startLifetime / bunnyDir[i] + 2;
-			}
-			else if (m_Particles[i].lifetime > m_Particles[i].startLifetime / bunnyDir[i] + 2)
-			{
-				m_Particles[i].lifetime = m_Particles[i].startLifetime / bunnyDir[i] + 2;
-			}*/
 			#endregion
 
 			#region Velocity capping
@@ -493,7 +455,9 @@ public class BunnyParticles : MonoBehaviour
 			}
 			#endregion
 		}
-		
+
+		//Debug.Log("Largest: " + largestAdjust + "\nSmallest: " + smallestAdjust);
+
 		// Apply the particle changes to the particle system
 		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
 	}
