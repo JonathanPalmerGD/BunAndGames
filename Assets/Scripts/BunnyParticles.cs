@@ -180,9 +180,9 @@ public class BunnyParticles : MonoBehaviour
 		float xVel, yVel;
 		float accel;
 		bool set;
-		float lifeTime, cycles, dirMin, maxAge, minAge, ageAdjust;
+		float lifeTime, cycles, maxAge, minAge, ageAdjust;
 		
-		float largestAdjust = 0, smallestAdjust = 0;
+		//float largestAdjust = 0, smallestAdjust = 0;
 
 		// Change only the particles that are alive
 		for (int i = 0; i < numParticlesAlive; i++)
@@ -398,36 +398,53 @@ public class BunnyParticles : MonoBehaviour
 			#endregion
 			#endregion
 
-			#region Epoch Locking
-			lifeTime = bunnyPart.startLifetime;
-			cycles = 8;
-			dirMin = Mathf.Clamp((bunnyDir[i] - 1), 0, 8);
+			#region Age Adjustment based on velocity magnitude
 
-			maxAge = lifeTime - (bunnyDir[i] * 8 * cycles / lifeTime);
-			minAge = lifeTime - ((bunnyDir[i] + 1) * 8 * cycles / lifeTime);
-				//lifeTime - (dirMin * 8) * cycles/lifeTime;
-			//float minAge = 
-				//lifeTime - (bunnyDir[i] * 8) * cycles / lifeTime;
+			//	Epoch Locking - Age Adjustment
+			//			by Jonathan Palmer
 
-			//Debug.Log("Dir: " + bunnyDir[i] + "\t\t" + maxAge + "\t\t" + minAge + "\n");
+			//Age Adjust is how much we need to adjust the age of this particle this frame.
 
-			//float maxAge = 20 - bunnyDir[i] * .555555555f;			
-			//float minAge = 20 - (bunnyDir[i] + 1) * .555555555f;
-
-			//Debug.Log(m_Particles[i].velocity.magnitude + "\n");
+			//	Step 1: Divide the magnitude by 100
+			//	Step 2: Allow for the animation to be slowed, subtract a small amount
+			//	Step 3: Clamp it between a min value (to prevent stopping or reversing animation)
+			//	Step 4: Clamp it between a max value (to prevent it from skipping too many frames)
 			ageAdjust = Mathf.Clamp(m_Particles[i].velocity.magnitude / 100 - .02f, -.01f, .2f);
-			//ageAdjust = m_Particles[i].velocity.magnitude / 100 - .02f;
 
-			if (ageAdjust > largestAdjust)
+
+			//	Final Step: Alter the particle lifetime.
+			m_Particles[i].lifetime -= ageAdjust;
+
+			//The particles are handed back into the particle system at the end of BunnyParticles.HandleParticle()
+
+			/*if (ageAdjust > largestAdjust)
 			{
 				largestAdjust = ageAdjust;
 			}
 			if (ageAdjust < smallestAdjust)
 			{
 				smallestAdjust = ageAdjust;
-			}
-			m_Particles[i].lifetime -= (m_Particles[i].velocity.magnitude / 100 - .02f);
+			}*/
+			#endregion
 
+			#region Epoch Locking
+			//			By Jonathan Palmer
+
+			//Side note: bunnyDir is a CPU side int array the size of how many bunny particles we have.
+			//	The int in the array at each indexed location represents the direction the bunny is moving
+			//	Bunny Direction int: (0-7, starting 0 for north and incrementing clockwise)
+
+			//Total particle Lifetime
+			lifeTime = bunnyPart.startLifetime;
+
+			//How many cycles it is set to animate.
+			cycles = 8;
+
+			//Unfortunately, we're calculating this every frame.
+			//Future improvement: Calculate this once for each direction.
+			maxAge = lifeTime - (bunnyDir[i] * 8 * cycles / lifeTime);
+			minAge = lifeTime - ((bunnyDir[i] + 1) * 8 * cycles / lifeTime);
+			
 			//If the current lifetime is above the MAX lifetime, set it to the max lifetime
 			if (m_Particles[i].lifetime >= maxAge)
 			{
