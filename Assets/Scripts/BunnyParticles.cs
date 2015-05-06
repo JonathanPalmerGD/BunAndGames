@@ -462,50 +462,6 @@ public class BunnyParticles : MonoBehaviour
 		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
 	}
 
-	void ClampParticleVel()
-	{
-		InitializeIfNeeded();
-
-		int numParticlesAlive = bunnyPart.GetParticles(m_Particles);
-		int bound = 10;
-
-		// Change only the particles that are alive
-		for (int i = 0; i < numParticlesAlive; i++)
-		{
-			m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.x < -bound && m_Particles[i].velocity.x < 0)
-			{
-				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
-			}
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.x > bound && m_Particles[i].velocity.x > 0)
-			{
-				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, 0, m_Particles[i].velocity.z);
-			}
-
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.z < -bound && m_Particles[i].velocity.z < 0)
-			{
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
-			}
-
-			//If particle would leave the screen
-			if (m_Particles[i].position.z > bound && m_Particles[i].velocity.z > 0)
-			{
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, 0, -m_Particles[i].velocity.z);
-			}
-
-			m_Particles[i].velocity.Normalize();
-		}
-
-		// Apply the particle changes to the particle system
-		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
-	}
-
 	void RandomParticleColor()
 	{
 		InitializeIfNeeded();
