@@ -18,7 +18,7 @@ public class BunnyParticles : MonoBehaviour
 	private float maxVelocity = 2;
 	public int HowManyBunnies;
 	public AudioSource bark;
-
+    public bool collisions = false;
 	public CameraController camCon;
 
 	public Camera cam;
@@ -150,6 +150,7 @@ public class BunnyParticles : MonoBehaviour
 
 		HandleParticles();
 
+        StartCoroutine("BunnyVelAndCol");
 		//ClampParticleVel();
 	}
 
@@ -170,167 +171,82 @@ public class BunnyParticles : MonoBehaviour
 
 		Vector3 dogPos = new Vector3(dog.transform.position.x, dog.transform.position.y, 0);
 		Vector3 fearVector = Vector3.zero;
-		Vector3 obsPos;
+		//Vector3 obsPos;
 		float dist;
-		float prevVel;
-		float distFromObj = float.MaxValue;
+		//float prevVel;
+		//float distFromObj = float.MaxValue;
 		float xVel, yVel;
-		float accel;
+		//float accel;
 		bool set;
 		float lifeTime, cycles, maxAge, minAge, ageAdjust;
 		
 		//float largestAdjust = 0, smallestAdjust = 0;
 
 		// Change only the particles that are alive
-		for (int i = 0; i < numParticlesAlive; i++)
-		{
-			#region Big Screen Bounding
-				//lowerLeftHC;
-				//topRightHC;
+        for (int i = 0; i < numParticlesAlive; i++)
+        {
+            #region Bunny Painting
+            if (paintCounter > 0)
+            {
+                dist = Vector3.Distance(paintPoint, m_Particles[i].position);
+                if (dist < 1.25f)
+                {
+                    m_Particles[i].color = paintColor;
+                }
+            }
+            #endregion
 
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+            #region Direction Storing
+            //StoreVelocity
+            bunnyInfo[i] = m_Particles[i].velocity.ToString();
+            //Vector3 curVel = m_Particles[i].velocity;
 
-				//If particle would leave the screen
-				if (m_Particles[i].position.x < camCon.lowerLeftHC.x + 1 && m_Particles[i].velocity.x < 0)
-				{
-					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-				}
+            //Directional
+            //	7	0	1
+            //	6	+	2
+            //	5	4	3
 
-				//If particle would leave the screen
-				if (m_Particles[i].position.x > camCon.topRightHC.x - 1 && m_Particles[i].velocity.x > 0)
-				{
-					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-				}
+            xVel = m_Particles[i].velocity.x;
+            yVel = m_Particles[i].velocity.y;
 
+            set = false;
 
-				//If particle would leave the screen
-				if (m_Particles[i].position.y < camCon.lowerLeftHC.y + 1 && m_Particles[i].velocity.y < 0)
-				{
-					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
-				}
+            if (xVel > 0)
+            {
+                if (xVel > Mathf.Abs(yVel))
+                {
+                    bunnyDir[i] = 2;
+                    set = true;
+                }
+            }
+            else
+            {
+                if (xVel < -Mathf.Abs(yVel))
+                {
+                    bunnyDir[i] = 6;
+                    set = true;
+                }
+            }
+            if (!set)
+            {
+                if (yVel > 0)
+                {
+                    if (yVel > Mathf.Abs(xVel))
+                    {
+                        bunnyDir[i] = 0;
+                    }
+                }
+                else
+                {
+                    if (yVel < -Mathf.Abs(xVel))
+                    {
+                        bunnyDir[i] = 4;
+                    }
+                }
+            }
 
-				//If particle would leave the screen
-				if (m_Particles[i].position.y > camCon.topRightHC.y - 1 && m_Particles[i].velocity.y > 0)
-				{
-					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
-				}
-				#endregion
-			
-			#region Bunny Painting
-			if (paintCounter > 0)
-			{
-				dist = Vector3.Distance(paintPoint, m_Particles[i].position);
-				if (dist < 1.25f)
-				{
-					m_Particles[i].color = paintColor;
-				}
-			}
-			#endregion
-
-			#region Bunny Scaring
-			if (dog != null)
-			{
-				distFromObj = Vector3.Distance(m_Particles[i].position, dogPos);
-				if (distFromObj < fleeRange)
-				{
-					GameManager.Inst.GainPointsTimeRate(3);
-
-					fearVector = dogPos - m_Particles[i].position;
-
-					//Debug.DrawLine(dogPos, dogPos - fearVector, Color.black, .5f);
-					m_Particles[i].velocity -= fearVector;
-					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-					m_Particles[i].velocity.Normalize();
-					if (distFromObj < .2f)
-					{
-						distFromObj = .2f;
-					}
-					accel = (fearStrength / distFromObj);
-
-					m_Particles[i].velocity = m_Particles[i].velocity * accel;
-					m_Particles[i].velocity.Normalize();
-				}
-			}
-
-			#endregion
-
-			#region Walls
-			if (obs != null)
-			{
-				for (int j = 0; j < obs.Count; j++)
-				{
-					distFromObj = Vector3.Distance(m_Particles[i].position, obs[j].transform.position);
-
-					if (distFromObj < obs[j].radius)
-					{
-						prevVel = m_Particles[i].velocity.magnitude;
-
-						obsPos = new Vector3(obs[j].transform.position.x + m_Particles[i].velocity.x * Time.deltaTime, obs[j].transform.position.y + m_Particles[i].velocity.y * Time.deltaTime, 0);
-						fearVector = obsPos - m_Particles[i].position;
-
-						m_Particles[i].velocity -= fearVector;
-						m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-						m_Particles[i].velocity.Normalize();
-
-						Debug.DrawLine(m_Particles[i].position, m_Particles[i].position + m_Particles[i].velocity.normalized, Color.green, 5.0f);
-						//m_Particles[i].velocity = m_Particles[i].velocity;
-						//m_Particles[i].velocity.Normalize();
-					}
-				}
-			}
-			#endregion
-
-			#region Direction Storing
-			//StoreVelocity
-			bunnyInfo[i] = m_Particles[i].velocity.ToString();
-			//Vector3 curVel = m_Particles[i].velocity;
-
-			//Directional
-			//	7	0	1
-			//	6	+	2
-			//	5	4	3
-
-			xVel = m_Particles[i].velocity.x;
-			yVel = m_Particles[i].velocity.y;
-
-			set = false;
-
-			if (xVel > 0)
-			{
-				if (xVel > Mathf.Abs(yVel))
-				{
-					bunnyDir[i] = 2;
-					set = true;
-				}
-			}
-			else
-			{
-				if(xVel < -Mathf.Abs(yVel))
-				{
-					bunnyDir[i] = 6;
-					set = true;
-				}
-			}
-			if (!set)
-			{
-				if (yVel > 0)
-				{
-					if (yVel > Mathf.Abs(xVel))
-					{
-						bunnyDir[i] = 0;
-					}
-				}
-				else
-				{
-					if (yVel < -Mathf.Abs(xVel))
-					{
-						bunnyDir[i] = 4;
-					}
-				}
-			}
-
-			#region Diagonal Directions
-			/*
+            #region Diagonal Directions
+            /*
 			if (m_Particles[i].velocity.x > 0)
 			{
 				if (m_Particles[i].velocity.y > 0)
@@ -353,89 +269,186 @@ public class BunnyParticles : MonoBehaviour
 					bunnyDir[i] = 5;
 				}
 			}*/
-			#endregion
-			#endregion
+            #endregion
+            #endregion
 
-			#region Age Adjustment based on velocity magnitude
+            #region Age Adjustment based on velocity magnitude
 
-			//	Epoch Locking - Age Adjustment
-			//			by Jonathan Palmer
+            //	Epoch Locking - Age Adjustment
+            //			by Jonathan Palmer
 
-			//Age Adjust is how much we need to adjust the age of this particle this frame.
+            //Age Adjust is how much we need to adjust the age of this particle this frame.
 
-			//	Step 1: Divide the magnitude by 100
-			//	Step 2: Allow for the animation to be slowed, subtract a small amount
-			//	Step 3: Clamp it between a min value (to prevent stopping or reversing animation)
-			//	Step 4: Clamp it between a max value (to prevent it from skipping too many frames)
-			ageAdjust = Mathf.Clamp(m_Particles[i].velocity.magnitude / 100 - .02f, -.01f, .2f);
+            //	Step 1: Divide the magnitude by 100
+            //	Step 2: Allow for the animation to be slowed, subtract a small amount
+            //	Step 3: Clamp it between a min value (to prevent stopping or reversing animation)
+            //	Step 4: Clamp it between a max value (to prevent it from skipping too many frames)
+            ageAdjust = Mathf.Clamp(m_Particles[i].velocity.magnitude / 100 - .02f, -.01f, .2f);
 
 
-			//	Final Step: Alter the particle lifetime.
-			m_Particles[i].lifetime -= ageAdjust;
+            //	Final Step: Alter the particle lifetime.
+            m_Particles[i].lifetime -= ageAdjust;
 
-			//The particles are handed back into the particle system at the end of BunnyParticles.HandleParticle()
+            //The particles are handed back into the particle system at the end of BunnyParticles.HandleParticle()
 
-			/*if (ageAdjust > largestAdjust)
-			{
-				largestAdjust = ageAdjust;
-			}
-			if (ageAdjust < smallestAdjust)
-			{
-				smallestAdjust = ageAdjust;
-			}*/
-			#endregion
+            /*if (ageAdjust > largestAdjust)
+            {
+                largestAdjust = ageAdjust;
+            }
+            if (ageAdjust < smallestAdjust)
+            {
+                smallestAdjust = ageAdjust;
+            }*/
+            #endregion
 
-			#region Epoch Locking
-			//			By Jonathan Palmer
+            #region Epoch Locking
+            //			By Jonathan Palmer
 
-			//Side note: bunnyDir is a CPU side int array the size of how many bunny particles we have.
-			//	The int in the array at each indexed location represents the direction the bunny is moving
-			//	Bunny Direction int: (0-7, starting 0 for north and incrementing clockwise)
+            //Side note: bunnyDir is a CPU side int array the size of how many bunny particles we have.
+            //	The int in the array at each indexed location represents the direction the bunny is moving
+            //	Bunny Direction int: (0-7, starting 0 for north and incrementing clockwise)
 
-			//Total particle Lifetime
-			lifeTime = bunnyPart.startLifetime;
+            //Total particle Lifetime
+            lifeTime = bunnyPart.startLifetime;
 
-			//How many cycles it is set to animate.
-			cycles = 8;
+            //How many cycles it is set to animate.
+            cycles = 8;
 
-			//Unfortunately, we're calculating this every frame.
-			//Future improvement: Calculate this once for each direction.
-			maxAge = lifeTime - (bunnyDir[i] * 8 * cycles / lifeTime);
-			minAge = lifeTime - ((bunnyDir[i] + 1) * 8 * cycles / lifeTime);
-			
-			//If the current lifetime is above the MAX lifetime, set it to the max lifetime
-			if (m_Particles[i].lifetime >= maxAge)
-			{
-				m_Particles[i].lifetime = maxAge;
-			}
-			//If the current lifetime is below the MIN lifetime, set it to the min lifetime
-			else if(m_Particles[i].lifetime <= minAge + .15f)
-			{
-				m_Particles[i].lifetime = maxAge - .15f;
-			}
-			#endregion
+            //Unfortunately, we're calculating this every frame.
+            //Future improvement: Calculate this once for each direction.
+            maxAge = lifeTime - (bunnyDir[i] * 8 * cycles / lifeTime);
+            minAge = lifeTime - ((bunnyDir[i] + 1) * 8 * cycles / lifeTime);
 
-			#region Velocity capping
-			bunnyInfo[i] += "   " + m_Particles[i].velocity.magnitude;
-
-			if (m_Particles[i].velocity.magnitude > 10)
-			{
-				//m_Particles[i].color = Color.black;
-				m_Particles[i].velocity = m_Particles[i].velocity.normalized * 5;
-			}
-			else
-			{
-				float mag = m_Particles[i].velocity.magnitude;
-				m_Particles[i].velocity = m_Particles[i].velocity.normalized * Mathf.Lerp(mag, maxVelocity, Time.deltaTime);
-			}
-			#endregion
-		}
+            //If the current lifetime is above the MAX lifetime, set it to the max lifetime
+            if (m_Particles[i].lifetime >= maxAge)
+            {
+                m_Particles[i].lifetime = maxAge;
+            }
+            //If the current lifetime is below the MIN lifetime, set it to the min lifetime
+            else if (m_Particles[i].lifetime <= minAge + .15f)
+            {
+                m_Particles[i].lifetime = maxAge - .15f;
+            }
+            #endregion
+        }
 
 		//Debug.Log("Largest: " + largestAdjust + "\nSmallest: " + smallestAdjust);
 
 		// Apply the particle changes to the particle system
 		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
 	}
+
+    IEnumerator BunnyVelAndCol() {
+        // Change only the particles that are alive
+        int numParticlesAlive = bunnyPart.GetParticles(m_Particles);
+
+        Vector3 dogPos = new Vector3(dog.transform.position.x, dog.transform.position.y, 0);
+        Vector3 fearVector = Vector3.zero;
+        Vector3 obsPos;
+        float prevVel;
+        float distFromObj = float.MaxValue;
+        float accel;
+        for (int i = 0; i < numParticlesAlive; i++) {
+            #region Big Screen Bounding
+            //lowerLeftHC;
+            //topRightHC;
+
+            m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+
+            //If particle would leave the screen
+            if (m_Particles[i].position.x < camCon.lowerLeftHC.x + 1 && m_Particles[i].velocity.x < 0)
+            {
+                m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+            }
+
+            //If particle would leave the screen
+            if (m_Particles[i].position.x > camCon.topRightHC.x - 1 && m_Particles[i].velocity.x > 0)
+            {
+                m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+            }
+
+
+            //If particle would leave the screen
+            if (m_Particles[i].position.y < camCon.lowerLeftHC.y + 1 && m_Particles[i].velocity.y < 0)
+            {
+                m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
+            }
+
+            //If particle would leave the screen
+            if (m_Particles[i].position.y > camCon.topRightHC.y - 1 && m_Particles[i].velocity.y > 0)
+            {
+                m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
+            }
+            #endregion
+            #region Bunny Scaring
+            if (dog != null)
+            {
+                distFromObj = Vector3.Distance(m_Particles[i].position, dogPos);
+                if (distFromObj < fleeRange)
+                {
+                    GameManager.Inst.GainPointsTimeRate(3);
+
+                    fearVector = dogPos - m_Particles[i].position;
+
+                    //Debug.DrawLine(dogPos, dogPos - fearVector, Color.black, .5f);
+                    m_Particles[i].velocity -= fearVector;
+                    m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+                    m_Particles[i].velocity.Normalize();
+                    if (distFromObj < .2f)
+                    {
+                        distFromObj = .2f;
+                    }
+                    accel = (fearStrength / distFromObj);
+
+                    m_Particles[i].velocity = m_Particles[i].velocity * accel;
+                    m_Particles[i].velocity.Normalize();
+                }
+            }
+
+            #endregion
+            #region Walls
+            if (obs != null)
+            {
+                for (int j = 0; j < obs.Count; j++)
+                {
+                    distFromObj = Vector3.Distance(m_Particles[i].position, obs[j].transform.position);
+
+                    if (distFromObj < obs[j].radius)
+                    {
+                        prevVel = m_Particles[i].velocity.magnitude;
+
+                        obsPos = new Vector3(obs[j].transform.position.x + m_Particles[i].velocity.x * Time.deltaTime, obs[j].transform.position.y + m_Particles[i].velocity.y * Time.deltaTime, 0);
+                        fearVector = obsPos - m_Particles[i].position;
+
+                        m_Particles[i].velocity -= fearVector;
+                        m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+                        m_Particles[i].velocity.Normalize();
+
+                        Debug.DrawLine(m_Particles[i].position, m_Particles[i].position + m_Particles[i].velocity.normalized, Color.green, 5.0f);
+                        //m_Particles[i].velocity = m_Particles[i].velocity;
+                        //m_Particles[i].velocity.Normalize();
+                    }
+                }
+            }
+            #endregion
+            #region Velocity capping
+            bunnyInfo[i] += "   " + m_Particles[i].velocity.magnitude;
+
+            if (m_Particles[i].velocity.magnitude > 10)
+            {
+                //m_Particles[i].color = Color.black;
+                m_Particles[i].velocity = m_Particles[i].velocity.normalized * 5;
+            }
+            else
+            {
+                float mag = m_Particles[i].velocity.magnitude;
+                m_Particles[i].velocity = m_Particles[i].velocity.normalized * Mathf.Lerp(mag, maxVelocity, Time.deltaTime);
+            }
+            #endregion
+        }
+        bunnyPart.SetParticles(m_Particles, numParticlesAlive);
+        yield return null;
+    }
 
 	void RandomParticleColor()
 	{
