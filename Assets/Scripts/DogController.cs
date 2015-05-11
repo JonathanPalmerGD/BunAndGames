@@ -32,26 +32,14 @@ public class DogController : MonoBehaviour
 	{
 		clicks = new List<Vector3>();
 
-		lRend.SetWidth(.2f, .2f);
+		if (lRend != null)
+		{
+			lRend.SetWidth(.2f, .2f);
+		}
 	}
 
 	void Update()
 	{
-		DrawPath();
-
-		#region Position Updating
-		if (clicks.Count > 0)
-		{
-			/*Debug.DrawLine(transform.position, clicks[0] - Vector3.forward, Color.cyan);
-			for (int i = 1; i < clicks.Count; i++)
-			{
-				Debug.DrawLine(clicks[i - 1] - Vector3.forward, clicks[i] - Vector3.forward, Color.white);
-			}*/
-				
-			targetPosition = clicks[0];
-		}
-		#endregion
-		
 		#region Animation
 		if (animating)
 		{
@@ -65,7 +53,7 @@ public class DogController : MonoBehaviour
 				float yDif = targetPosition.y - transform.position.y;
 
 				if (!movedLastFrame)
-					//if (xDif > -0.5f && xDif < 0.5f && yDif > -0.5f && yDif < 0.5f)
+				//if (xDif > -0.5f && xDif < 0.5f && yDif > -0.5f && yDif < 0.5f)
 				{
 					if (sprRend.sprite != sit1)
 					{
@@ -101,7 +89,34 @@ public class DogController : MonoBehaviour
 			}
 		}
 		#endregion
-	
+
+		if (GameManager.Inst.mode == GameManager.InputMode.Dog)
+		{
+			DogUpdate();
+		}
+		else if (GameManager.Inst.mode == GameManager.InputMode.Painting)
+		{
+			DogUpdate();
+		}
+	}
+
+	private void DogUpdate()
+	{
+		DrawPath();
+
+		#region Position Updating
+		if (clicks.Count > 0)
+		{
+			/*Debug.DrawLine(transform.position, clicks[0] - Vector3.forward, Color.cyan);
+			for (int i = 1; i < clicks.Count; i++)
+			{
+				Debug.DrawLine(clicks[i - 1] - Vector3.forward, clicks[i] - Vector3.forward, Color.white);
+			}*/
+
+			targetPosition = clicks[0];
+		}
+		#endregion
+
 		#region Position & Click updating
 		Vector3 dir = targetPosition - transform.position;
 		//Debug.Log(dir.magnitude);
@@ -142,7 +157,7 @@ public class DogController : MonoBehaviour
 		if (true)
 		{
 			#region Swiping
-			if(!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0))
+			if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0))
 			{
 				Vector3 targPoint = ScreenToWorldPos(mousePos);
 				if (clicks.Count > oldClicksAllowed)
@@ -161,12 +176,12 @@ public class DogController : MonoBehaviour
 
 					//if (magDiff > 2 || magDiff < -2)
 					//{
-						Vector3 targPoint = ScreenToWorldPos(mousePos);
-						if (clicks.Count > oldClicksAllowed)
-						{
-							clicks.RemoveAt(0);
-						}
-						clicks.Add(targPoint);
+					Vector3 targPoint = ScreenToWorldPos(mousePos);
+					if (clicks.Count > oldClicksAllowed)
+					{
+						clicks.RemoveAt(0);
+					}
+					clicks.Add(targPoint);
 					//}
 				}
 			}
@@ -186,6 +201,11 @@ public class DogController : MonoBehaviour
 			}
 			#endregion
 		}
+	}
+
+	private void PaintUpdate()
+	{
+
 	}
 
 	private void DrawPath()

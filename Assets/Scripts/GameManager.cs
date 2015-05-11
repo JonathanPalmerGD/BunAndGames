@@ -14,6 +14,11 @@ public class GameManager : MonoBehaviour
 	public AudioManager audioMan;
 	public static GameManager Inst;
 	public float playerPoints = 0;
+	public BunnyParticles bunPart;
+	public DogController dogCon;
+
+	public enum InputMode { Dog, Painting, Shop, Veggies, Environment };
+	public InputMode mode = InputMode.Dog;
 
 	public Text pointDisplay;
 
@@ -25,7 +30,25 @@ public class GameManager : MonoBehaviour
 
 	public void Update()
 	{
-		pointDisplay.text = ((int)playerPoints).ToString();
+		if (pointDisplay != null)
+		{
+			pointDisplay.text = ((int)playerPoints).ToString();
+		}
+
+		if (Input.GetKeyDown(KeyCode.Q))
+		{
+			ChangeInputMode(InputMode.Dog);
+		}
+		if (Input.GetKeyDown(KeyCode.W))
+		{
+			ChangeInputMode(InputMode.Painting);
+		}
+	}
+
+	public void ChangeInputMode(InputMode targetMode)
+	{
+		Debug.Log("[GameManager]\tChanging mode from " + mode.ToString() + " to " + targetMode.ToString());
+		mode = targetMode;
 	}
 
 	public void GainPointsTimeRate(float amount)
@@ -44,7 +67,7 @@ public class GameManager : MonoBehaviour
 
 		dog.SetActive(true);
 		bunEmitter.SetActive(true);
-		BunnyParticles bunPart = bunEmitter.GetComponent<BunnyParticles>();
+		bunPart = bunEmitter.GetComponent<BunnyParticles>();
 		bunPart.HowManyBunnies = (int)bunnyCount.value;
 
 		//GameObject dog = (GameObject)GameObject.Instantiate(dogPrefab, Vector3.zero, Quaternion.identity);

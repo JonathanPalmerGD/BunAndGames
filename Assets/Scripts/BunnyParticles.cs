@@ -85,7 +85,7 @@ public class BunnyParticles : MonoBehaviour
 		#endregion
 
 		#region Paint At Cursor
-		if (Input.GetKey(KeyCode.Q) || Input.GetMouseButton(1))
+		if (Input.GetKey(KeyCode.Z) || Input.GetMouseButton(1))
 		{
 			clickPos = Input.mousePosition;
 			clickPos.z = 10.0f;
@@ -165,9 +165,6 @@ public class BunnyParticles : MonoBehaviour
 	void HandleParticles()
 	{
 		InitializeIfNeeded();
-
-		int xBound = 9;
-		int yBound = 6;
 		
 		int numParticlesAlive = bunnyPart.GetParticles(m_Particles);
 
@@ -187,9 +184,7 @@ public class BunnyParticles : MonoBehaviour
 		// Change only the particles that are alive
 		for (int i = 0; i < numParticlesAlive; i++)
 		{
-			if (true)
-			{
-				#region Big Screen Bounding
+			#region Big Screen Bounding
 				//lowerLeftHC;
 				//topRightHC;
 
@@ -220,40 +215,7 @@ public class BunnyParticles : MonoBehaviour
 					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
 				}
 				#endregion
-			}
-			else
-			{
-				#region Screen bounding
-
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-
-				//If particle would leave the screen
-				if (m_Particles[i].position.x < -xBound && m_Particles[i].velocity.x < 0)
-				{
-					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-				}
-
-				//If particle would leave the screen
-				if (m_Particles[i].position.x > xBound && m_Particles[i].velocity.x > 0)
-				{
-					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-				}
-
-
-				//If particle would leave the screen
-				if (m_Particles[i].position.y < -yBound && m_Particles[i].velocity.y < 0)
-				{
-					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
-				}
-
-				//If particle would leave the screen
-				if (m_Particles[i].position.y > yBound && m_Particles[i].velocity.y > 0)
-				{
-					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
-				}
-				#endregion
-			}
-
+			
 			#region Bunny Painting
 			if (paintCounter > 0)
 			{
@@ -309,14 +271,10 @@ public class BunnyParticles : MonoBehaviour
 						m_Particles[i].velocity -= fearVector;
 						m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
 						m_Particles[i].velocity.Normalize();
-						if (distFromObj < .2f)
-						{
-							distFromObj = .2f;
-						} 
-						
-						accel = prevVel;
-						m_Particles[i].velocity = m_Particles[i].velocity * accel;
-						m_Particles[i].velocity.Normalize();
+
+						Debug.DrawLine(m_Particles[i].position, m_Particles[i].position + m_Particles[i].velocity.normalized, Color.green, 5.0f);
+						//m_Particles[i].velocity = m_Particles[i].velocity;
+						//m_Particles[i].velocity.Normalize();
 					}
 				}
 			}
