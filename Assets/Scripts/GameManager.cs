@@ -53,16 +53,11 @@ public class GameManager : MonoBehaviour
 									new Color(.600f, .823f, .894f),
 									new Color(.847f, .792f, .705f));
 		palettes.Add(pal);
-		pal = new Palette(Color.red, Color.blue, Color.white, 
-									new Color(.70f, .70f, .70f),
-									new Color(.70f, .70f, .70f));
+		pal = new Palette(Color.red, Color.blue, Color.white, Color.white, Color.white);
+
 		palettes.Add(pal);
-		pal = new Palette(new Color(.270f, .807f, .937f),
-									new Color(1.00f, .960f, .647f),
-									new Color(1.00f, .831f, .854f),
-									new Color(.600f, .823f, .894f),
-									new Color(.847f, .792f, .705f));
-		//palettes.Add(pal);
+		pal = new Palette(Color.red, Color.gray, Color.cyan, Color.green, Color.yellow);
+		palettes.Add(pal);
 		pal = new Palette(new Color(.270f, .807f, .937f),
 									new Color(1.00f, .960f, .647f),
 									new Color(1.00f, .831f, .854f),
@@ -96,12 +91,11 @@ public class GameManager : MonoBehaviour
 			ChangeInputMode(InputMode.Shop);
 		}
 
-
-		if (Input.GetKeyDown(KeyCode.V))
+		if (Input.GetKeyDown(KeyCode.X))
 		{
-			ChangeInputMode(0);
+			SetPalette(0);
 		}
-		if (Input.GetKeyDown(KeyCode.V))
+		if (Input.GetKeyDown(KeyCode.C))
 		{
 			SetPalette(1);
 		}
@@ -109,11 +103,6 @@ public class GameManager : MonoBehaviour
 		{
 			SetPalette(2);
 		}
-		if (Input.GetKeyDown(KeyCode.V))
-		{
-			SetPalette(3);
-		}
-
 	}
 
 	#region State Machine Control
