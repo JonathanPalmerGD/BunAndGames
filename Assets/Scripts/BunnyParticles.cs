@@ -194,6 +194,7 @@ public class BunnyParticles : MonoBehaviour
 
 	public void Bark()
 	{
+		Debug.Log("BARKING\n");
 		GameManager.Inst.GainPoints(2);
 
 		fleeRange = 6;
@@ -527,7 +528,7 @@ public class BunnyParticles : MonoBehaviour
 						//Debug.Log("Distance: " + dist + "\n");
 						if (dist < Blobs[k].transform.localScale.x / 2)
 						{
-							GameManager.Inst.GainPoints(.25f);
+							GameManager.Inst.GainPoints(.75f);
 							bunnyColor[i] = Blobs[k].colorIndex;
 						}
 					}
