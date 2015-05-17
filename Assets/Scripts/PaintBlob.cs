@@ -3,6 +3,7 @@ using System.Collections;
 
 public class PaintBlob : MonoBehaviour {
     public const float SCALE_MULT_BASE = 1.2f;
+	public int colorIndex;
     public static Color PaintColor = Color.cyan;
     public static BunnyParticles bunnies;
     public Color BlobColor = Color.black;
@@ -23,13 +24,15 @@ public class PaintBlob : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        gameObject.renderer.material.color = PaintColor;
+		SetColor(0);
 		scale = gameObject.transform.localScale;
         bunnies.Blobs.Add(this);
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
+		gameObject.renderer.material.color = new Color(bunnies.PaletteColor[colorIndex].r, bunnies.PaletteColor[colorIndex].g, bunnies.PaletteColor[colorIndex].b, gameObject.renderer.material.color.a);
+		BlobColor = gameObject.renderer.material.color;
         if (state == BState.Done) {
             if (BlobColor.a < 0.05f){
                 bunnies.Blobs.Remove(this);
@@ -58,6 +61,11 @@ public class PaintBlob : MonoBehaviour {
 		if(state != BState.Done){
 			gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, scale * Mathf.Clamp(ScaleMultiplier, 0, 10), 0.26f);
         }
+	}
+	public void SetColor(int newColorIndex)
+	{
+		colorIndex = newColorIndex;
+		gameObject.renderer.material.color = bunnies.PaletteColor[colorIndex];
 	}
 
 	public void Approach(Vector3 _target) {

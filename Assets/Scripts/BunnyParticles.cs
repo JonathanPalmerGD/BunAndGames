@@ -41,7 +41,7 @@ public class BunnyParticles : MonoBehaviour
 	private float paintChangeRate = 10;
 
 
-	private Color[] PaletteColor = { new Color( .270f, .807f, .937f),
+	public Color[] PaletteColor = { new Color( .270f, .807f, .937f),
 									new Color( 1.00f, .960f, .647f),
 									new Color( 1.00f, .831f, .854f),
 									new Color( .600f, .823f, .894f),
@@ -218,11 +218,12 @@ public class BunnyParticles : MonoBehaviour
 		float accel;
 		bool set;
 		float lifeTime, cycles, maxAge, minAge, ageAdjust;
+		int i, j, k = 0;
 		
 		//float largestAdjust = 0, smallestAdjust = 0;
 
 		// Change only the particles that are alive
-		for (int i = 0; i < numParticlesAlive; i++)
+		for (i = 0; i < numParticlesAlive; i++)
 		{
 			#region Big Screen Bounding
 			//lowerLeftHC;
@@ -257,13 +258,17 @@ public class BunnyParticles : MonoBehaviour
 			#endregion
 
 			#region Bunny Painting
-			if (paintCounter > 0)
+			if (Blobs.Count > 0)
 			{
-				dist = Vector3.Distance(paintPoint, m_Particles[i].position);
-				if (dist < 1.25f)
+				for (k = 0; k < Blobs.Count; k++)
 				{
-					m_Particles[i].color = PaletteColor[bunnyColor[i]];
-					//m_Particles[i].color = paintColor;
+					dist = Vector3.Distance(m_Particles[i].position, Blobs[k].transform.position);
+
+					Debug.Log("Distance: " + dist + "\n");
+					if (dist < Blobs[k].transform.localScale.x / 2)
+					{
+						m_Particles[i].color = PaletteColor[Blobs[k].colorIndex];
+					}
 				}
 			}
 
@@ -273,12 +278,7 @@ public class BunnyParticles : MonoBehaviour
 			if (paletteChanged)
 			{
 				m_Particles[i].color = PaletteColor[bunnyColor[i]];
-				/*dist = Vector3.Distance(paintPoint, m_Particles[i].position);
-				if (dist < 1.25f)
-				{
-					m_Particles[i].color = PaletteColor[bunnyColor[i]];
-					//m_Particles[i].color = paintColor;
-				}*/
+				
 			}
 			#endregion
 
@@ -312,7 +312,7 @@ public class BunnyParticles : MonoBehaviour
 			#region Walls
 			if (obs != null)
 			{
-				for (int j = 0; j < obs.Count; j++)
+				for (j = 0; j < obs.Count; j++)
 				{
 					distFromObj = Vector3.Distance(m_Particles[i].position, obs[j].transform.position);
 
@@ -508,24 +508,41 @@ public class BunnyParticles : MonoBehaviour
 		//float accel;
 		bool set;
 		float lifeTime, cycles, maxAge, minAge, ageAdjust;
+		int i, j, k = 0;
 		
 		//float largestAdjust = 0, smallestAdjust = 0;
 
 		// Change only the particles that are alive
-        for (int i = 0; i < numParticlesAlive; i++)
+        for (i = 0; i < numParticlesAlive; i++)
         {
-            #region Bunny Painting
-			if (paletteChanged || paintCounter > 0)
-            {
-				m_Particles[i].color = PaletteColor[bunnyColor[i]];
-				/*dist = Vector3.Distance(paintPoint, m_Particles[i].position);
-				if (dist < 1.25f)
+			#region Bunny Painting
+			if (Blobs.Count > 0)
+			{
+				for (k = 0; k < Blobs.Count; k++)
 				{
-					m_Particles[i].color = PaletteColor[bunnyColor[i]];
-					//m_Particles[i].color = paintColor;
-				}*/
-            }
-            #endregion
+					if (bunnyColor[i] != Blobs[k].colorIndex)
+					{
+						dist = Vector3.Distance(m_Particles[i].position, Blobs[k].transform.position);
+
+						//Debug.Log("Distance: " + dist + "\n");
+						if (dist < Blobs[k].transform.localScale.x / 2)
+						{
+							GameManager.Inst.GainPoints(.25f);
+							bunnyColor[i] = Blobs[k].colorIndex;
+						}
+					}
+				}
+			}
+
+			#endregion
+
+			#region Palette Color Changing
+			if (paletteChanged)
+			{
+				m_Particles[i].color = PaletteColor[bunnyColor[i]];
+
+			}
+			#endregion
 
             #region Direction Storing
             //StoreVelocity

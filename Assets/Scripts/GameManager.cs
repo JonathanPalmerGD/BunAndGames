@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
 	public float playerPoints = 0;
 	public List<Palette> palettes;
 
+	public int paintingIndex = 0;
+
 	#region Unlocked Abilities
 	public bool unlockedPainting;
 	public bool unlockedVeggies;
