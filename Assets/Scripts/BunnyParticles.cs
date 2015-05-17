@@ -527,7 +527,7 @@ public class BunnyParticles : MonoBehaviour
 						//Debug.Log("Distance: " + dist + "\n");
 						if (dist < Blobs[k].transform.localScale.x / 2)
 						{
-							GameManager.Inst.GainPoints(.25f);
+							GameManager.Inst.GainPoints(.75f);
 							bunnyColor[i] = Blobs[k].colorIndex;
 						}
 					}
