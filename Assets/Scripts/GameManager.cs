@@ -1,27 +1,37 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
+	#region Dog, BunEmtiter DogController & Particles
 	public GameObject bunEmitterPrefab;
 	public GameObject dogPrefab;
 	public GameObject bunEmitter;
 	public GameObject dog;
+	public BunnyParticles bunPart;
+	public DogController dogCon;
+	#endregion
+
+	#region Self-Instance, Canvas, & Overhead
+	public static GameManager Inst;
+	public AudioManager audioMan;
 	public Canvas shopCanvas;
 	public Canvas menuCanvas;
 	public Canvas inGameCanvas;
 	public Slider bunnyCount;
-	public AudioManager audioMan;
-	public static GameManager Inst;
-	public float playerPoints = 0;
-	public BunnyParticles bunPart;
-	public DogController dogCon;
+	#endregion
 
+	public float playerPoints = 0;
+	public List<Palette> palettes;
+
+	#region Unlocked Abilities
 	public bool unlockedPainting;
 	public bool unlockedVeggies;
 	public bool unlockedEnvironment;
-
+	#endregion
 
 	public enum InputMode { Dog, Painting, Shop, Veggies, Environment };
 	public InputMode mode = InputMode.Dog;
@@ -34,6 +44,32 @@ public class GameManager : MonoBehaviour
 		Inst = this;
 		shopCanvas.gameObject.SetActive(false);
 		inGameCanvas.gameObject.SetActive(false);
+
+		palettes = new List<Palette>();
+
+		Palette pal = new Palette(new Color(.270f, .807f, .937f),
+									new Color(1.00f, .960f, .647f),
+									new Color(1.00f, .831f, .854f),
+									new Color(.600f, .823f, .894f),
+									new Color(.847f, .792f, .705f));
+		palettes.Add(pal);
+		pal = new Palette(Color.red, Color.blue, Color.white, 
+									new Color(.70f, .70f, .70f),
+									new Color(.70f, .70f, .70f));
+		palettes.Add(pal);
+		pal = new Palette(new Color(.270f, .807f, .937f),
+									new Color(1.00f, .960f, .647f),
+									new Color(1.00f, .831f, .854f),
+									new Color(.600f, .823f, .894f),
+									new Color(.847f, .792f, .705f));
+		//palettes.Add(pal);
+		pal = new Palette(new Color(.270f, .807f, .937f),
+									new Color(1.00f, .960f, .647f),
+									new Color(1.00f, .831f, .854f),
+									new Color(.600f, .823f, .894f),
+									new Color(.847f, .792f, .705f));
+		//palettes.Add(pal);
+		Debug.Log(palettes.Count + "\n");
 	}
 
 	public void Update()
@@ -59,8 +95,28 @@ public class GameManager : MonoBehaviour
 		{
 			ChangeInputMode(InputMode.Shop);
 		}
+
+
+		if (Input.GetKeyDown(KeyCode.V))
+		{
+			ChangeInputMode(0);
+		}
+		if (Input.GetKeyDown(KeyCode.V))
+		{
+			SetPalette(1);
+		}
+		if (Input.GetKeyDown(KeyCode.V))
+		{
+			SetPalette(2);
+		}
+		if (Input.GetKeyDown(KeyCode.V))
+		{
+			SetPalette(3);
+		}
+
 	}
 
+	#region State Machine Control
 	public void ChangeInputMode(InputMode targetMode)
 	{
 		Debug.Log("[GameManager]\tChanging mode from " + mode.ToString() + " to " + targetMode.ToString());
@@ -68,6 +124,25 @@ public class GameManager : MonoBehaviour
 		mode = targetMode;
 	}
 
+	public void OpenShop()
+	{
+		if (mode != InputMode.Shop)
+		{
+			ChangeInputMode(InputMode.Shop);
+			shopCanvas.gameObject.SetActive(true);
+		}
+	}
+	public void CloseShop()
+	{
+		if (mode == InputMode.Shop)
+		{
+			ChangeInputMode(previousMode);
+			shopCanvas.gameObject.SetActive(false);
+		}
+	}
+	#endregion
+
+	#region Point Gain
 	public void GainPointsTimeRate(float amount)
 	{
 		playerPoints += amount * Time.deltaTime;
@@ -77,7 +152,9 @@ public class GameManager : MonoBehaviour
 	{
 		playerPoints += amount;
 	}
+	#endregion
 
+	#region Button-called Methods
 	public void BeginGame()
 	{
 		audioMan.state_change = true;
@@ -98,25 +175,8 @@ public class GameManager : MonoBehaviour
 		//#endif
 
 		bunPart.Init();
-	}
-
-	public void OpenShop()
-	{
-		if (mode != InputMode.Shop)
-		{
-			ChangeInputMode(InputMode.Shop);
-			shopCanvas.gameObject.SetActive(true);
-		}
-	}
-	public void CloseShop()
-	{
-		if (mode == InputMode.Shop)
-		{
-			ChangeInputMode(previousMode);
-			shopCanvas.gameObject.SetActive(false);
-		}
-	}
-
+	}	
+	
 	public void StopGame()
 	{
 		audioMan.state_change = false;
@@ -133,4 +193,11 @@ public class GameManager : MonoBehaviour
 		inGameCanvas.gameObject.SetActive(false);
 //#endif
 	}
+	#endregion
+
+	public void SetPalette(int targPaletteIndex)
+	{
+		bunPart.SetPalette(palettes[targPaletteIndex]);
+	}
+
 }

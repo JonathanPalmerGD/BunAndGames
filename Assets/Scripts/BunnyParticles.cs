@@ -5,25 +5,33 @@ using System.Collections.Generic;
 
 public class BunnyParticles : MonoBehaviour
 {
+	#region Object references
+	public GameObject dog;
+	public CameraController camCon;
+	public Camera cam;
+	public AudioSource bark;
+	#endregion
+
+	#region Particle Info
 	public ParticleSystem bunnyPart;
 	ParticleSystem.Particle[] m_Particles;
-
-	public GameObject dog;
-
 	public string[] bunnyInfo;
 	public int[] bunnyDir;
+	public int[] bunnyColor;
 	private float normalFleeRange = 1.5f;
 	private float fleeRange = 1.5f;
 	private float fearStrength = 2f;
 	private float maxVelocity = 2;
 	public int HowManyBunnies;
-	public AudioSource bark;
-    public bool collisions = false;
-	public CameraController camCon;
+	public bool collisions = false;
+	#endregion
 
-	public Camera cam;
+	#region Thread vs Normal
+	bool switching = false;
+	bool printing = false;
+	#endregion
 
-	#region Coloring
+	#region Color Variables
 	public bool forcePalette = true;
 	public Vector3 paintPoint;
 	private float paintCounter = 0;
@@ -40,10 +48,10 @@ public class BunnyParticles : MonoBehaviour
 
 	public Color[] colorOptions;
 	public int paintIndex;
+	private bool paletteChanged = false;
 	#endregion
 
 	private Vector3 clickPos;
-
 	private List<Obstacle> obs;
 
 	public void Init()
@@ -52,6 +60,7 @@ public class BunnyParticles : MonoBehaviour
 		bunnyPart.maxParticles = HowManyBunnies;
 		bunnyInfo = new string[HowManyBunnies];
 		bunnyDir = new int[HowManyBunnies];
+		bunnyColor = new int[HowManyBunnies];
 
 		obs = new List<Obstacle>();
 		UnityEngine.Object[] objects = GameObject.FindGameObjectsWithTag("Obstacle");
@@ -75,8 +84,6 @@ public class BunnyParticles : MonoBehaviour
 		Invoke("RandomParticleColor", 1f + HowManyBunnies / 900);
 	}
 
-	bool switching = false;
-	bool printing = false;
 	void Update()
 	{
 		#region Paint clock
@@ -191,6 +198,7 @@ public class BunnyParticles : MonoBehaviour
 		bark.Play();
 	}
 
+	#region Handle Particles
 	void HandleParticles()
 	{
 		InitializeIfNeeded();
@@ -246,12 +254,13 @@ public class BunnyParticles : MonoBehaviour
 				#endregion
 			
 			#region Bunny Painting
-			if (paintCounter > 0)
+			if (paletteChanged || paintCounter > 0)
 			{
 				dist = Vector3.Distance(paintPoint, m_Particles[i].position);
 				if (dist < 1.25f)
 				{
-					m_Particles[i].color = paintColor;
+					m_Particles[i].color = PaletteColor[bunnyColor[i]];
+					//m_Particles[i].color = paintColor;
 				}
 			}
 			#endregion
@@ -489,12 +498,12 @@ public class BunnyParticles : MonoBehaviour
         for (int i = 0; i < numParticlesAlive; i++)
         {
             #region Bunny Painting
-            if (paintCounter > 0)
+			if (paletteChanged || paintCounter > 0)
             {
                 dist = Vector3.Distance(paintPoint, m_Particles[i].position);
                 if (dist < 1.25f)
                 {
-                    m_Particles[i].color = paintColor;
+                    m_Particles[i].color = PaletteColor[bunnyColor[i]];
                 }
             }
             #endregion
@@ -775,7 +784,9 @@ public class BunnyParticles : MonoBehaviour
         bunnyPart.SetParticles(m_Particles, numParticlesAlive);
         yield return null;
     }
+	#endregion
 
+	#region Coloring
 	void RandomParticleColor()
 	{
 		InitializeIfNeeded();
@@ -787,16 +798,18 @@ public class BunnyParticles : MonoBehaviour
 		{
 			if (forcePalette)
 			{
-				m_Particles[i].color = GetRandColor();
+				bunnyColor[i] = Random.Range(0, PaletteColor.Length);
+				//m_Particles[i].color = GetRandColor();
 			}
 			else
 			{
-			m_Particles[i].color = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+			//m_Particles[i].color = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
 			}
 		}
 
+		paletteChanged = true;
 		// Apply the particle changes to the particle system
-		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
+		//bunnyPart.SetParticles(m_Particles, numParticlesAlive);
 	}
 
 	void UpdateParticleColor(Color newColor)
@@ -817,11 +830,6 @@ public class BunnyParticles : MonoBehaviour
 		bunnyPart.SetParticles(m_Particles, numParticlesAlive);
 	}
 
-	public void ClearBunnies()
-	{
-		bunnyPart.maxParticles = 0;
-	}
-
 	private Color GetRandColor()
 	{
 		if (PaletteColor.Length > 0)
@@ -829,6 +837,21 @@ public class BunnyParticles : MonoBehaviour
 			return PaletteColor[Random.Range(0, PaletteColor.Length)];
 		}
 		return Color.black;
+	}
+
+	public void SetPalette(Palette newPalette)
+	{
+		paletteChanged = true;
+		for(int i = 0; i < newPalette.PaletteColor.Length; i++)
+		{
+			PaletteColor[i] = newPalette.PaletteColor[i];
+		}
+	}
+	#endregion
+
+	public void ClearBunnies()
+	{
+		bunnyPart.maxParticles = 0;
 	}
 
 	void InitializeIfNeeded()
