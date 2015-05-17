@@ -8,8 +8,9 @@ public class GameManager : MonoBehaviour
 	public GameObject dogPrefab;
 	public GameObject bunEmitter;
 	public GameObject dog;
-	public Canvas menuUI;
-	public Canvas barkCanvas;
+	public Canvas shopCanvas;
+	public Canvas menuCanvas;
+	public Canvas inGameCanvas;
 	public Slider bunnyCount;
 	public AudioManager audioMan;
 	public static GameManager Inst;
@@ -17,15 +18,22 @@ public class GameManager : MonoBehaviour
 	public BunnyParticles bunPart;
 	public DogController dogCon;
 
+	public bool unlockedPainting;
+	public bool unlockedVeggies;
+	public bool unlockedEnvironment;
+
+
 	public enum InputMode { Dog, Painting, Shop, Veggies, Environment };
 	public InputMode mode = InputMode.Dog;
+	public InputMode previousMode = InputMode.Dog;
 
 	public Text pointDisplay;
 
 	public void Start()
 	{
 		Inst = this;
-		barkCanvas.gameObject.SetActive(false);
+		shopCanvas.gameObject.SetActive(false);
+		inGameCanvas.gameObject.SetActive(false);
 	}
 
 	public void Update()
@@ -35,6 +43,10 @@ public class GameManager : MonoBehaviour
 			pointDisplay.text = ((int)playerPoints).ToString();
 		}
 
+		if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.S))
+		{
+			GainPoints(3000);
+		}
 		if (Input.GetKeyDown(KeyCode.Q))
 		{
 			ChangeInputMode(InputMode.Dog);
@@ -43,11 +55,16 @@ public class GameManager : MonoBehaviour
 		{
 			ChangeInputMode(InputMode.Painting);
 		}
+		if (Input.GetKeyDown(KeyCode.E))
+		{
+			ChangeInputMode(InputMode.Shop);
+		}
 	}
 
 	public void ChangeInputMode(InputMode targetMode)
 	{
 		Debug.Log("[GameManager]\tChanging mode from " + mode.ToString() + " to " + targetMode.ToString());
+		previousMode = mode;
 		mode = targetMode;
 	}
 
@@ -67,20 +84,37 @@ public class GameManager : MonoBehaviour
 
 		dog.SetActive(true);
 		bunEmitter.SetActive(true);
+		shopCanvas.gameObject.SetActive(false);
 		bunPart = bunEmitter.GetComponent<BunnyParticles>();
 		bunPart.HowManyBunnies = (int)bunnyCount.value;
 
 		//GameObject dog = (GameObject)GameObject.Instantiate(dogPrefab, Vector3.zero, Quaternion.identity);
 		//BunnyParticles bunPart = ((GameObject)GameObject.Instantiate(bunEmitterPrefab, Vector3.zero, Quaternion.identity)).GetComponent<BunnyParticles>();
 		bunPart.dog = dog;
-		menuUI.gameObject.SetActive(false);
+		menuCanvas.gameObject.SetActive(false);
 
 		//#if UNITY_ANDROID
-		barkCanvas.gameObject.SetActive(true);
+		inGameCanvas.gameObject.SetActive(true);
 		//#endif
 
 		bunPart.Init();
+	}
 
+	public void OpenShop()
+	{
+		if (mode != InputMode.Shop)
+		{
+			ChangeInputMode(InputMode.Shop);
+			shopCanvas.gameObject.SetActive(true);
+		}
+	}
+	public void CloseShop()
+	{
+		if (mode == InputMode.Shop)
+		{
+			ChangeInputMode(previousMode);
+			shopCanvas.gameObject.SetActive(false);
+		}
 	}
 
 	public void StopGame()
@@ -93,10 +127,10 @@ public class GameManager : MonoBehaviour
 		bunPart.ClearBunnies();
 
 		bunPart.dog = dog;
-		menuUI.gameObject.SetActive(true);
+		menuCanvas.gameObject.SetActive(true);
 
 //#if UNITY_ANDROID
-		barkCanvas.gameObject.SetActive(false);
+		inGameCanvas.gameObject.SetActive(false);
 //#endif
 	}
 }
