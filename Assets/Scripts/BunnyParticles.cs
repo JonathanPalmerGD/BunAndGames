@@ -169,7 +169,7 @@ public class BunnyParticles : MonoBehaviour
 		
 		int numParticlesAlive = bunnyPart.GetParticles(m_Particles);
 
-		Vector3 dogPos = new Vector3(dog.transform.position.x, dog.transform.position.y, 0);
+		Vector3 dogPos = new Vector3(dog.transform.position.x, dog.transform.position.y , 0);
 		Vector3 fearVector = Vector3.zero;
 		//Vector3 obsPos;
 		float dist;

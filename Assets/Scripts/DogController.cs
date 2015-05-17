@@ -28,6 +28,8 @@ public class DogController : MonoBehaviour
 	public LineRenderer lRend;
 	public SpriteRenderer sprRend;
 
+    public GameObject BlobPrefab;
+
 	void Start()
 	{
 		clicks = new List<Vector3>();
@@ -96,7 +98,7 @@ public class DogController : MonoBehaviour
 		}
 		else if (GameManager.Inst.mode == GameManager.InputMode.Painting)
 		{
-			DogUpdate();
+			PaintUpdate();
 		}
 	}
 
@@ -205,8 +207,15 @@ public class DogController : MonoBehaviour
 
 	private void PaintUpdate()
 	{
-
-	}
+        #region Tapping to shoot
+        mousePos = Input.mousePosition;
+		if (Input.GetMouseButtonDown(0))
+		{
+			PaintBlob blob = ((GameObject)GameObject.Instantiate(BlobPrefab, gameObject.transform.position, Quaternion.identity)).GetComponent<PaintBlob>();
+            blob.Approach(mousePos);
+        }
+        #endregion
+    }
 
 	private void DrawPath()
 	{
