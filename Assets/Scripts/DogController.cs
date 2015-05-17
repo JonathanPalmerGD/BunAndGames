@@ -221,6 +221,7 @@ public class DogController : MonoBehaviour
             _target.z = gameObject.transform.position.z;
 
 			blob.colorIndex = GameManager.Inst.paintingIndex;
+            Debug.Log(blob.colorIndex);
             blob.Approach(_target);
         }
         #endregion
