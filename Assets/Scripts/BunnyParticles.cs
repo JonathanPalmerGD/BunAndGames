@@ -222,39 +222,52 @@ public class BunnyParticles : MonoBehaviour
 		for (int i = 0; i < numParticlesAlive; i++)
 		{
 			#region Big Screen Bounding
-				//lowerLeftHC;
-				//topRightHC;
+			//lowerLeftHC;
+			//topRightHC;
 
-				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+			m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
 
-				//If particle would leave the screen
-				if (m_Particles[i].position.x < camCon.lowerLeftHC.x + 1 && m_Particles[i].velocity.x < 0)
-				{
-					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-				}
+			//If particle would leave the screen
+			if (m_Particles[i].position.x < camCon.lowerLeftHC.x + 1 && m_Particles[i].velocity.x < 0)
+			{
+				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+			}
 
-				//If particle would leave the screen
-				if (m_Particles[i].position.x > camCon.topRightHC.x - 1 && m_Particles[i].velocity.x > 0)
-				{
-					m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
-				}
+			//If particle would leave the screen
+			if (m_Particles[i].position.x > camCon.topRightHC.x - 1 && m_Particles[i].velocity.x > 0)
+			{
+				m_Particles[i].velocity = new Vector3(-m_Particles[i].velocity.x, m_Particles[i].velocity.y, 0);
+			}
 
 
-				//If particle would leave the screen
-				if (m_Particles[i].position.y < camCon.lowerLeftHC.y + 1 && m_Particles[i].velocity.y < 0)
-				{
-					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
-				}
+			//If particle would leave the screen
+			if (m_Particles[i].position.y < camCon.lowerLeftHC.y + 1 && m_Particles[i].velocity.y < 0)
+			{
+				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
+			}
 
-				//If particle would leave the screen
-				if (m_Particles[i].position.y > camCon.topRightHC.y - 1 && m_Particles[i].velocity.y > 0)
-				{
-					m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
-				}
-				#endregion
-			
+			//If particle would leave the screen
+			if (m_Particles[i].position.y > camCon.topRightHC.y - 1 && m_Particles[i].velocity.y > 0)
+			{
+				m_Particles[i].velocity = new Vector3(m_Particles[i].velocity.x, -m_Particles[i].velocity.y, 0);
+			}
+			#endregion
+
 			#region Bunny Painting
-			if (paletteChanged || paintCounter > 0)
+			if (paintCounter > 0)
+			{
+				dist = Vector3.Distance(paintPoint, m_Particles[i].position);
+				if (dist < 1.25f)
+				{
+					m_Particles[i].color = PaletteColor[bunnyColor[i]];
+					//m_Particles[i].color = paintColor;
+				}
+			}
+
+			#endregion
+
+			#region Palette Color Changing
+			if (paletteChanged)
 			{
 				m_Particles[i].color = PaletteColor[bunnyColor[i]];
 				/*dist = Vector3.Distance(paintPoint, m_Particles[i].position);
