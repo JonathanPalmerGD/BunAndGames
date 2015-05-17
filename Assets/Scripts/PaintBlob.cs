@@ -4,7 +4,7 @@ using System.Collections;
 public class PaintBlob : MonoBehaviour {
     public const float SCALE_MULT_BASE = 1.2f;
     public static Color PaintColor = Color.cyan;
-
+    public static BunnyParticles bunnies;
     public Color BlobColor = Color.black;
 	public bool Active;
 	public Vector3 Target;
@@ -25,13 +25,16 @@ public class PaintBlob : MonoBehaviour {
 	void Start () {
         gameObject.renderer.material.color = PaintColor;
 		scale = gameObject.transform.localScale;
+        bunnies.Blobs.Add(this);
 	}
 	
 	// Update is called once per frame
 	void Update () {
         if (state == BState.Done) {
-            if (BlobColor.a < 0.05f)
+            if (BlobColor.a < 0.05f){
+                bunnies.Blobs.Remove(this);
                 Destroy(gameObject);
+            }
             else {
                 BlobColor = gameObject.renderer.material.GetColor("_Color");
                 BlobColor.a = alpha = Mathf.Lerp(alpha, 0, 0.2f);

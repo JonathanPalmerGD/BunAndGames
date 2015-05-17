@@ -10,6 +10,7 @@ public class BunnyParticles : MonoBehaviour
 	public CameraController camCon;
 	public Camera cam;
 	public AudioSource bark;
+    public List<PaintBlob> Blobs;
 	#endregion
 
 	#region Particle Info
@@ -51,8 +52,8 @@ public class BunnyParticles : MonoBehaviour
 	private bool paletteChanged = false;
 	#endregion
 
-	private Vector3 clickPos;
-	private List<Obstacle> obs;
+    private Vector3 clickPos;
+    private List<Obstacle> obs;
 
 	public void Init()
 	{
@@ -63,6 +64,8 @@ public class BunnyParticles : MonoBehaviour
 		bunnyColor = new int[HowManyBunnies];
 
 		obs = new List<Obstacle>();
+        Blobs = new List<PaintBlob>();
+        PaintBlob.bunnies = this;
 		UnityEngine.Object[] objects = GameObject.FindGameObjectsWithTag("Obstacle");
 
 		foreach (GameObject go in GameObject.FindGameObjectsWithTag("Obstacle"))
