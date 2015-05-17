@@ -256,12 +256,13 @@ public class BunnyParticles : MonoBehaviour
 			#region Bunny Painting
 			if (paletteChanged || paintCounter > 0)
 			{
-				dist = Vector3.Distance(paintPoint, m_Particles[i].position);
+				m_Particles[i].color = PaletteColor[bunnyColor[i]];
+				/*dist = Vector3.Distance(paintPoint, m_Particles[i].position);
 				if (dist < 1.25f)
 				{
 					m_Particles[i].color = PaletteColor[bunnyColor[i]];
 					//m_Particles[i].color = paintColor;
-				}
+				}*/
 			}
 			#endregion
 
@@ -500,11 +501,13 @@ public class BunnyParticles : MonoBehaviour
             #region Bunny Painting
 			if (paletteChanged || paintCounter > 0)
             {
-                dist = Vector3.Distance(paintPoint, m_Particles[i].position);
-                if (dist < 1.25f)
-                {
-                    m_Particles[i].color = PaletteColor[bunnyColor[i]];
-                }
+				m_Particles[i].color = PaletteColor[bunnyColor[i]];
+				/*dist = Vector3.Distance(paintPoint, m_Particles[i].position);
+				if (dist < 1.25f)
+				{
+					m_Particles[i].color = PaletteColor[bunnyColor[i]];
+					//m_Particles[i].color = paintColor;
+				}*/
             }
             #endregion
 

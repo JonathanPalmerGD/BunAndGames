@@ -53,12 +53,11 @@ public class PaintBlob : MonoBehaviour {
 		}
 
 		if(state != BState.Done){
-            Debug.Log("Scale:" + scale);
-            Debug.Log("ScaleM:" + ScaleMultiplier);
-            Mathf.Clamp(ScaleMultiplier, 0, 10);
-            Debug.Log("Wat: " + Vector3.Lerp(gameObject.transform.localScale, scale * ScaleMultiplier, 0.26f));
-            gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, scale * ScaleMultiplier, 0.26f);
-            Debug.Log(gameObject+"\n");
+            //Debug.Log("Scale:" + scale);
+            //Debug.Log("ScaleM:" + ScaleMultiplier);
+            //Debug.Log("Wat: " + Vector3.Lerp(gameObject.transform.localScale, scale * ScaleMultiplier, 0.26f));
+			gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, scale * Mathf.Clamp(ScaleMultiplier, 0, 10), 0.26f);
+            //Debug.Log(gameObject+"\n");
         }
 	}
 
