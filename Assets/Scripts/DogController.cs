@@ -211,8 +211,15 @@ public class DogController : MonoBehaviour
         mousePos = Input.mousePosition;
 		if (Input.GetMouseButtonDown(0))
 		{
+            RaycastHit hit;
+            Vector3 _target = mousePos;
+            Ray ray = Camera.main.ScreenPointToRay(_target);
+            if (GameObject.Find("Grass Background").GetComponent<Collider>().Raycast(ray, out hit, 100.0F))
+                _target = ray.GetPoint(100.0F);
+
 			PaintBlob blob = ((GameObject)GameObject.Instantiate(BlobPrefab, gameObject.transform.position, Quaternion.identity)).GetComponent<PaintBlob>();
-            blob.Approach(mousePos);
+            _target.z = gameObject.transform.position.z;
+            blob.Approach(_target);
         }
         #endregion
     }

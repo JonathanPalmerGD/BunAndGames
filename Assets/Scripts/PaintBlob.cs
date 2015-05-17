@@ -30,38 +30,37 @@ public class PaintBlob : MonoBehaviour {
 		}
 		if (state == BState.Approaching) {
 			ScaleMultiplier = 1;
-            Debug.Log("HI!!")
-            gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, Target, 0.05f);
-            if ((gameObject.transform.position - Target).magnitude < 0.05f) { state = BState.Splat; }
+			gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, Target, 0.75f);
+			if ((gameObject.transform.position - Target).magnitude == 0) { state = BState.Splat; }
 		}
 		if (state == BState.Splat) {
-			ScaleMultiplier = 1 + (0.5f * UPPERLIMIT(SplatFrame, 2f)/(40.1f-SplatFrame));
-            if (SplatFrame > 40) { 
-                SplatFrame = 0;
-                state = BState.Done;
-            }
+			ScaleMultiplier = 1 + (0.5f * UPPERLIMIT(SplatFrame, 2f));
+			if (SplatFrame > 120) { 
+				SplatFrame = 0;
+				state = BState.Done;
+			}
 
-            SplatFrame++;
+			SplatFrame++;
 		}
 		gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, scale * ScaleMultiplier, 0.01f);
 	}
 
-    public void Approach(Vector3 _target) {
-        Target = _target;
-        state = BState.Approaching;
-        Active = true;
-    }
+	public void Approach(Vector3 _target) {
+		Target = _target;
+		state = BState.Approaching;
+		Active = true;
+	}
 
 	public int UPPERLIMIT(int i, float f){
 		if (i > f)
 			return (int)f;
-        return i;
+		return i;
 	}
 
-    public int UPPERLIMIT(int i, int i2)
-    {
-        if (i > i2)
-            return i2;
-        return i;
-    }
+	public int UPPERLIMIT(int i, int i2)
+	{
+		if (i > i2)
+			return i2;
+		return i;
+	}
 }
