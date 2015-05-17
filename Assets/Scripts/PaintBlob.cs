@@ -2,21 +2,22 @@
 using System.Collections;
 
 public class PaintBlob : MonoBehaviour {
+    public const float SCALE_MULT_BASE = 1.2f;
+
     public static Color PaintColor = Color.cyan;
 	public bool Active;
 	public Vector3 Target;
 	public float ScaleMultiplier = 1;
 	public Vector3 scale;
+    private float alpha = 1.0f;
 
 	public int SplatFrame = 0;
-
 	public enum BState {
 		Init,
 		Approaching,
 		Splat,
 		Done
 	}
-
 	private BState state = BState.Init;
 
 	// Use this for initialization
@@ -27,25 +28,29 @@ public class PaintBlob : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        //gameObject.renderer.material.color = Color.Lerp(gameObject.renderer.material.color, PaintColor,0.1f)
-		if (state == BState.Done) {
-			Destroy(gameObject);
+        if (state == BState.Done) {
+            if (alpha <= 0)
+                Destroy(gameObject);
+            else {
+                Color _c = gameObject.renderer.material.GetColor("_Color");
+                _c.a = alpha = Mathf.Lerp(alpha, 0, 0.2f);
+                gameObject.renderer.material.SetColor("_Color", _c);
+            }
 		}
 		if (state == BState.Approaching) {
 			ScaleMultiplier = 1;
 			gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, Target, 0.35f);
-			if ((gameObject.transform.position - Target).magnitude == 0) { state = BState.Splat; }
+			if ((gameObject.transform.position - Target).magnitude < 0.05f) { state = BState.Splat; }
 		}
 		if (state == BState.Splat) {
-			ScaleMultiplier = 1 + (1.5f * UPPERLIMIT(SplatFrame, 2f));
-			if (SplatFrame > 40) { 
+			ScaleMultiplier = 1 + (SCALE_MULT_BASE * 2 * UpperLimit(3.5f*SplatFrame, 4f)/(SplatFrame-1));
+			if (SplatFrame > 20) { 
 				SplatFrame = 0;
 				state = BState.Done;
 			}
-
 			SplatFrame++;
 		}
-		gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, scale * ScaleMultiplier, 0.1f);
+		gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, scale * ScaleMultiplier, 0.16f);
 	}
 
 	public void Approach(Vector3 _target) {
@@ -54,16 +59,30 @@ public class PaintBlob : MonoBehaviour {
 		Active = true;
 	}
 
-	public int UPPERLIMIT(int i, float f){
+	public int UpperLimit(int i, float f){
 		if (i > f)
 			return (int)f;
 		return i;
 	}
 
-	public int UPPERLIMIT(int i, int i2)
+	public int UpperLimit(int i, int i2)
 	{
 		if (i > i2)
 			return i2;
 		return i;
 	}
+
+    public float UpperLimit(float f, float f2)
+    {
+        if (f > f2)
+            return f2;
+        return f;
+    }
+
+    public float UpperLimit(float f, int i)
+    {
+        if (f > i)
+            return (float)i;
+        return f;
+    }
 }

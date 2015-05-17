@@ -3,10 +3,10 @@
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 		_SubTex ("Sub-texture (RGB)", 2D) = "white" {}
 		_EmisColor ("Emissive Color", Color) = (0.2,0.2,0.2,0)
-		_Color ("Multiply Color", Color) = (0,0,0)
+		_Color ("Multiply Color", Color) = (0.0,0.0,0.0,1.0)
 	}
 	SubShader {
-		Tags { "LIGHTMODE"="Vertex" "QUEUE"="Transparent" "IGNOREPROJECTOR"="true" "RenderType"="Transparent" }
+		Tags { "QUEUE"="Transparent" "IGNOREPROJECTOR"="true" "RenderType"="Transparent" }
 		LOD 200
 		
 		Lighting Off
@@ -34,7 +34,7 @@
 
 		sampler2D _MainTex;
 		sampler2D _SubTex;
-		float3 _Color;
+		float4 _Color;
 
 		struct Input {
 			float2 uv_MainTex;
@@ -43,8 +43,8 @@
 		void surf (Input IN, inout SurfaceOutput o) {
 			half4 c = tex2D (_MainTex, IN.uv_MainTex);
 			half4 s = tex2D (_SubTex, IN.uv_MainTex);
-			o.Albedo = s.rgb*_Color;
-			o.Alpha = c.a;
+			o.Albedo = s.rgb*_Color.rgb;
+			o.Alpha = (c.a * _Color.a);
 		}
 		ENDCG
 	} 
