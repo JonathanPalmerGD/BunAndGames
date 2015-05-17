@@ -54,6 +54,7 @@ public class BunnyParticles : MonoBehaviour
 
     private Vector3 clickPos;
     private List<Obstacle> obs;
+    public bool barking = false;
 
 	public void Init()
 	{
@@ -86,6 +87,10 @@ public class BunnyParticles : MonoBehaviour
 
 		Invoke("RandomParticleColor", 1f + HowManyBunnies / 900);
 	}
+
+    public void SetBarkingTrue() {
+        barking = true;
+    }
 
 	void Update()
 	{
@@ -152,9 +157,12 @@ public class BunnyParticles : MonoBehaviour
 		#endregion
 
 		#region Barking
-		if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
+            barking = true;
+		if (barking)
 		{
 			Bark();
+            barking = false;
 		}
 
 		fleeRange = Mathf.Lerp(fleeRange, normalFleeRange, Time.deltaTime * 10);

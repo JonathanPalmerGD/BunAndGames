@@ -11,6 +11,7 @@ public class PaintBlob : MonoBehaviour {
 	public Vector3 Target;
 	public float ScaleMultiplier = 1;
 	public Vector3 scale;
+    public Light light;
     private float alpha = 1.0f;
 
 	public int SplatFrame = 0;
@@ -24,15 +25,17 @@ public class PaintBlob : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		SetColor(0);
 		scale = gameObject.transform.localScale;
         bunnies.Blobs.Add(this);
+        light = gameObject.GetComponent<Light>();
 	}
 
 	// Update is called once per frame
 	void Update () {
-		gameObject.renderer.material.color = new Color(bunnies.PaletteColor[colorIndex].r, bunnies.PaletteColor[colorIndex].g, bunnies.PaletteColor[colorIndex].b, gameObject.renderer.material.color.a);
+        gameObject.renderer.material.color = new Color(bunnies.PaletteColor[colorIndex].r, bunnies.PaletteColor[colorIndex].g, bunnies.PaletteColor[colorIndex].b, gameObject.renderer.material.color.a);
 		BlobColor = gameObject.renderer.material.color;
+        light.intensity = Mathf.Clamp(0.22f * alpha, 0, 0.22f);
+        light.color = gameObject.renderer.material.color;
         if (state == BState.Done) {
             if (BlobColor.a < 0.05f){
                 bunnies.Blobs.Remove(this);
@@ -65,7 +68,9 @@ public class PaintBlob : MonoBehaviour {
 	public void SetColor(int newColorIndex)
 	{
 		colorIndex = newColorIndex;
-		gameObject.renderer.material.color = bunnies.PaletteColor[colorIndex];
+        Color color = bunnies.PaletteColor[colorIndex];
+        color.a = gameObject.renderer.material.color.a;
+        gameObject.renderer.material.color = color;
 	}
 
 	public void Approach(Vector3 _target) {

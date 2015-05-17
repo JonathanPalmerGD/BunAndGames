@@ -220,7 +220,7 @@ public class DogController : MonoBehaviour
 			PaintBlob blob = ((GameObject)GameObject.Instantiate(BlobPrefab, gameObject.transform.position, Quaternion.identity)).GetComponent<PaintBlob>();
             _target.z = gameObject.transform.position.z;
 
-			blob.colorIndex = GameManager.Inst.paintingIndex;
+            blob.SetColor(GameManager.Inst.paintingIndex);
             Debug.Log(blob.colorIndex);
             blob.Approach(_target);
         }

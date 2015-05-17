@@ -67,7 +67,8 @@ public class EasterEggManager : MonoBehaviour {
 	}
 
 	void activate_konami_code(){
-		if(debug){Debug.Log("Konami Code Activated!");}
+        if (debug) { Debug.Log("Konami Code Activated!"); }
+        pausePrefab.audio.volume += 0.4f;
 		GameObject.Instantiate(pausePrefab, Vector3.zero, Quaternion.identity);
 	}
 
