@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
 	public bool unlockedEnvironment;
 	#endregion
 
-	public enum InputMode { Dog, Painting, Shop, Veggies, Environment };
+	public enum InputMode { Dog = 0, Painting, Shop, Veggies, Environment };
 	public InputMode mode = InputMode.Dog;
 	public InputMode previousMode = InputMode.Dog;
 
@@ -108,6 +108,11 @@ public class GameManager : MonoBehaviour
 	}
 
 	#region State Machine Control
+	public void ChangeInputMode(int targetMode)
+	{
+		ChangeInputMode((InputMode)targetMode);
+	}
+	
 	public void ChangeInputMode(InputMode targetMode)
 	{
 		Debug.Log("[GameManager]\tChanging mode from " + mode.ToString() + " to " + targetMode.ToString());

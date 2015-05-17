@@ -194,6 +194,7 @@ public class BunnyParticles : MonoBehaviour
 
 	public void Bark()
 	{
+		Debug.Log("BARKING\n");
 		GameManager.Inst.GainPoints(2);
 
 		fleeRange = 6;
