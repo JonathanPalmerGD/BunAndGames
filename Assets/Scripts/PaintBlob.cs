@@ -3,8 +3,9 @@ using System.Collections;
 
 public class PaintBlob : MonoBehaviour {
     public const float SCALE_MULT_BASE = 1.2f;
-
     public static Color PaintColor = Color.cyan;
+
+    public Color BlobColor = Color.black;
 	public bool Active;
 	public Vector3 Target;
 	public float ScaleMultiplier = 1;
@@ -29,12 +30,12 @@ public class PaintBlob : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (state == BState.Done) {
-            if (alpha <= 0)
+            if (BlobColor.a < 0.05f)
                 Destroy(gameObject);
             else {
-                Color _c = gameObject.renderer.material.GetColor("_Color");
-                _c.a = alpha = Mathf.Lerp(alpha, 0, 0.2f);
-                gameObject.renderer.material.SetColor("_Color", _c);
+                BlobColor = gameObject.renderer.material.GetColor("_Color");
+                BlobColor.a = alpha = Mathf.Lerp(alpha, 0, 0.2f);
+                gameObject.renderer.material.SetColor("_Color", BlobColor);
             }
 		}
 		if (state == BState.Approaching) {
@@ -50,7 +51,15 @@ public class PaintBlob : MonoBehaviour {
 			}
 			SplatFrame++;
 		}
-		gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, scale * ScaleMultiplier, 0.16f);
+
+		if(state != BState.Done){
+            Debug.Log("Scale:" + scale);
+            Debug.Log("ScaleM:" + ScaleMultiplier);
+            Mathf.Clamp(ScaleMultiplier, 0, 10);
+            Debug.Log("Wat: " + Vector3.Lerp(gameObject.transform.localScale, scale * ScaleMultiplier, 0.26f));
+            gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, scale * ScaleMultiplier, 0.26f);
+            Debug.Log(gameObject+"\n");
+        }
 	}
 
 	public void Approach(Vector3 _target) {
