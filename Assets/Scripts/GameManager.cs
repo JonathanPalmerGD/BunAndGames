@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour
 									new Color(1.00f, .831f, .854f),
 									new Color(.600f, .823f, .894f),
 									new Color(.847f, .792f, .705f));
-		//palettes.Add(pal);
+		palettes.Add(pal);
 		Debug.Log(palettes.Count + "\n");
 	}
 
