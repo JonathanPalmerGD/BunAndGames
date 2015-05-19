@@ -55,10 +55,12 @@ public class BunnyParticles : MonoBehaviour
     private Vector3 clickPos;
     private List<Obstacle> obs;
     public bool barking = false;
+    public Queue<Vector3> Pops;
 
 	public void Init()
 	{
 		InitializeIfNeeded();
+        Pops = new Queue<Vector3>();
 		bunnyPart.maxParticles = HowManyBunnies;
 		bunnyInfo = new string[HowManyBunnies];
 		bunnyDir = new int[HowManyBunnies];
@@ -90,6 +92,10 @@ public class BunnyParticles : MonoBehaviour
 
     public void SetBarkingTrue() {
         barking = true;
+    }
+
+    private void AddPop(Vector3 position) {
+        Pops.Enqueue(position);
     }
 
 	void Update()

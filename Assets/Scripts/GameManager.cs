@@ -38,7 +38,8 @@ public class GameManager : MonoBehaviour
 	public enum InputMode { Dog = 0, Painting, Shop, Veggies, Environment };
 	public InputMode mode = InputMode.Dog;
 	public InputMode previousMode = InputMode.Dog;
-
+    public List<GameObject> DogModeButtons;
+    public List<GameObject> PaintModeButtons;
 	public Text pointDisplay;
 
 	public void Start()
@@ -46,7 +47,8 @@ public class GameManager : MonoBehaviour
 		Inst = this;
 		shopCanvas.gameObject.SetActive(false);
 		inGameCanvas.gameObject.SetActive(false);
-
+        DogModeButtons  = new List<GameObject>();
+        PaintModeButtons = new List<GameObject>();
 		palettes = new List<Palette>();
 
 		Palette pal = new Palette(new Color(.270f, .807f, .937f),
@@ -67,6 +69,18 @@ public class GameManager : MonoBehaviour
 									new Color(.847f, .792f, .705f));
 		palettes.Add(pal);
 		Debug.Log(palettes.Count + "\n");
+        if (mode == InputMode.Dog)
+        {
+            ShowButtons(DogModeButtons);
+        }
+        else
+            HideButtons(DogModeButtons);
+        if (mode == InputMode.Dog)
+        {
+            ShowButtons(PaintModeButtons);
+        }
+        else
+            HideButtons(PaintModeButtons);
 	}
 
 	public void Update()
@@ -105,7 +119,17 @@ public class GameManager : MonoBehaviour
 		{
 			SetPalette(2);
 		}
-	}
+    }
+
+    public void ShowButtons(List<GameObject> btnObjs) {
+        foreach (GameObject g in btnObjs)
+            g.SetActive(true);
+    }
+
+    public void HideButtons(List<GameObject> btnObjs) {
+        foreach (GameObject g in btnObjs)
+            g.SetActive(false);
+    }
 
 	#region State Machine Control
 	public void ChangeInputMode(int targetMode)
@@ -127,6 +151,18 @@ public class GameManager : MonoBehaviour
 			ChangeInputMode(InputMode.Shop);
 			shopCanvas.gameObject.SetActive(true);
 		}
+        if (mode == InputMode.Dog)
+        {
+            ShowButtons(DogModeButtons);
+        }
+        else
+            HideButtons(DogModeButtons);
+        if (mode == InputMode.Dog)
+        {
+            ShowButtons(PaintModeButtons);
+        }
+        else
+            HideButtons(PaintModeButtons);
 	}
 	public void CloseShop()
 	{
@@ -135,6 +171,18 @@ public class GameManager : MonoBehaviour
 			ChangeInputMode(previousMode);
 			shopCanvas.gameObject.SetActive(false);
 		}
+        if (mode == InputMode.Dog)
+        {
+            ShowButtons(DogModeButtons);
+        }
+        else
+            HideButtons(DogModeButtons);
+        if (mode == InputMode.Dog)
+        {
+            ShowButtons(PaintModeButtons);
+        }
+        else
+            HideButtons(PaintModeButtons);
 	}
 	#endregion
 
