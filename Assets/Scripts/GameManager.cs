@@ -144,6 +144,13 @@ public class GameManager : MonoBehaviour
 		mode = targetMode;
 	}
 
+    public void ShopBtn() {
+        if (mode == InputMode.Shop)
+            CloseShop();
+        else
+            OpenShop();
+    }
+
 	public void OpenShop()
 	{
 		if (mode != InputMode.Shop)

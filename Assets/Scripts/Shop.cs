@@ -4,8 +4,8 @@ using System.Collections;
 public class Shop : MonoBehaviour 
 {
 	public static Shop Inst;
-
-	public int paintingCost = 750;
+    public GameObject PaintBtn;
+	public int paintingCost = 200;
 	public int paletteCost = 150;
 	public int environmentCost = 750;
 	public int veggieCost = 750;
@@ -21,6 +21,8 @@ public class Shop : MonoBehaviour
 		{
 			GameManager.Inst.CloseShop();
 		}
+        if (Input.GetMouseButtonUp(0))
+            GameManager.Inst.CloseShop();
 	}
 
 	public void PurchasePainting()
@@ -28,7 +30,7 @@ public class Shop : MonoBehaviour
 		if (!GameManager.Inst.unlockedPainting && GameManager.Inst.playerPoints >= paintingCost)
 		{
 			Debug.Log("Purchased Painting Mode\n");
-
+            PaintBtn.SetActive(true);
 			GameManager.Inst.playerPoints -= paintingCost;
 
 			GameManager.Inst.unlockedPainting = true;

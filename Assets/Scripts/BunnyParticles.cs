@@ -25,6 +25,7 @@ public class BunnyParticles : MonoBehaviour
 	private float maxVelocity = 2;
 	public int HowManyBunnies;
 	public bool collisions = false;
+    public GameObject PopsPrefab;
 	#endregion
 
 	#region Thread vs Normal
@@ -203,8 +204,12 @@ public class BunnyParticles : MonoBehaviour
 				Debug.Log("Threaded\n");
 			}
 		}
-		//ClampParticleVel();
-	}
+        //ClampParticleVel();
+        #region pop timer
+        if (Pops.Count > 0)
+            GameObject.Instantiate(PopsPrefab, Pops.Dequeue(), Quaternion.identity);
+        #endregion
+    }
 
 	public void Bark()
 	{
@@ -283,6 +288,8 @@ public class BunnyParticles : MonoBehaviour
 					if (dist < Blobs[k].transform.localScale.x / 2)
 					{
 						m_Particles[i].color = PaletteColor[Blobs[k].colorIndex];
+                        GameManager.Inst.GainPoints(0.25f);
+                        Pops.Enqueue(m_Particles[i].position);
 					}
 				}
 			}
@@ -543,6 +550,7 @@ public class BunnyParticles : MonoBehaviour
 						if (dist < Blobs[k].transform.localScale.x / 2)
 						{
 							GameManager.Inst.GainPoints(.75f);
+                            Pops.Enqueue(m_Particles[i].position);
 							bunnyColor[i] = Blobs[k].colorIndex;
 						}
 					}
